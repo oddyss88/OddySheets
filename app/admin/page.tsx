@@ -1,22 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Product, ProductStatus } from '@/types/product'
-import { ArrowLeft, Plus, Trash2, Edit2, LogOut, ImageIcon, Link as LinkIcon, DollarSign, Tag, FileText, AlertCircle } from 'lucide-react'
+import { CATEGORIES } from '@/lib/constants'
+import ProductCard from '@/components/ProductCard'
+import ProductStatusBadge from '@/components/ProductStatusBadge'
+import Toast from '@/components/Toast'
+import {
+  ArrowLeft, Plus, Trash2, Edit2, LogOut, ImageIcon,
+  Link as LinkIcon, DollarSign, Tag, FileText, AlertCircle, Eye,
+} from 'lucide-react'
 import Link from 'next/link'
-
-const CATEGORIES = [
-  'Hoodies', 'Jackets', 'Sweatshirts', 'Shirts', 'T-Shirts',
-  'Shorts', 'Jeans', 'Pants', 'Shoes', 'Accessories', 'Cases',
-  'Bags', 'Hats', 'Socks', 'Underwear', 'Watches', 'Sunglasses', 'Jewelry'
-]
 
 const STATUSES: { value: ProductStatus; label: string }[] = [
   { value: 'new', label: 'NEW' },
   { value: 'in-stock', label: 'In Stock' },
   { value: 'pre-order', label: 'Pre-Order' },
-  { value: 'sold-out', label: 'Sold Out' }
+  { value: 'sold-out', label: 'Sold Out' },
 ]
 
 interface FormData {
@@ -36,8 +37,16 @@ const EMPTY_FORM: FormData = {
   image_url: '',
   affiliate_link: '',
   status: 'new',
-  description: ''
+  description: '',
 }
+
+interface ToastState {
+  message: string
+  type: 'success' | 'error'
+}
+
+const inputClass =
+  'w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors'
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -49,6 +58,7 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
+  const [toast, setToast] = useState<ToastState | null>(null)
 
   useEffect(() => {
     const auth = localStorage.getItem('admin_auth')
@@ -59,6 +69,27 @@ export default function AdminPage() {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), 4000)
+    return () => clearTimeout(timer)
+  }, [toast])
+
+  const previewProduct = useMemo((): Product | null => {
+    if (!formData.name && !formData.price) return null
+    return {
+      id: editingProduct?.id || 'preview',
+      name: formData.name || 'Product Name',
+      price: parseFloat(formData.price) || 0,
+      category: formData.category,
+      image_url: formData.image_url,
+      affiliate_link: formData.affiliate_link || '#',
+      status: formData.status,
+      description: formData.description,
+      created_at: editingProduct?.created_at || new Date().toISOString(),
+    }
+  }, [formData, editingProduct])
 
   async function fetchProducts() {
     try {
@@ -105,7 +136,7 @@ export default function AdminPage() {
       image_url: formData.image_url,
       affiliate_link: formData.affiliate_link,
       status: formData.status,
-      description: formData.description
+      description: formData.description,
     }
 
     try {
@@ -115,32 +146,33 @@ export default function AdminPage() {
           .update(productData)
           .eq('id', editingProduct.id)
         if (error) throw error
+        setToast({ message: 'Product updated successfully', type: 'success' })
       } else {
         const { error } = await supabase
           .from('products')
           .insert([productData])
         if (error) throw error
+        setToast({ message: 'Product added successfully', type: 'success' })
       }
 
       resetForm()
       fetchProducts()
     } catch (error) {
       console.error('Error saving product:', error)
-      alert('Error saving product. Check console.')
+      setToast({ message: 'Failed to save product', type: 'error' })
     }
   }
 
   async function handleDelete(id: string) {
     try {
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id)
+      const { error } = await supabase.from('products').delete().eq('id', id)
       if (error) throw error
       setDeleteConfirm(null)
+      setToast({ message: 'Product deleted', type: 'success' })
       fetchProducts()
     } catch (error) {
       console.error('Error deleting:', error)
+      setToast({ message: 'Failed to delete product', type: 'error' })
     }
   }
 
@@ -159,7 +191,7 @@ export default function AdminPage() {
       image_url: product.image_url,
       affiliate_link: product.affiliate_link,
       status: product.status,
-      description: product.description
+      description: product.description,
     })
     setShowAddForm(true)
   }
@@ -171,22 +203,20 @@ export default function AdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-white/10 p-8">
+        <div className="w-full max-w-md bg-card rounded-2xl border border-white/10 p-8 animate-fade-in">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold">OddySheets Admin</h1>
+            <h1 className="font-display text-2xl font-bold">OddySheets Admin</h1>
             <p className="text-gray-400 mt-2">Enter your admin password</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-              />
-            </div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputClass}
+            />
             {loginError && (
               <div className="flex items-center gap-2 text-red-400 text-sm">
                 <AlertCircle className="w-4 h-4" />
@@ -195,7 +225,7 @@ export default function AdminPage() {
             )}
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors"
+              className="w-full py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors"
             >
               Login
             </button>
@@ -214,7 +244,7 @@ export default function AdminPage() {
               <Link href="/" className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
-              <h1 className="text-xl font-bold">OddySheets Dashboard</h1>
+              <h1 className="font-display text-xl font-bold">Dashboard</h1>
             </div>
             <button
               onClick={handleLogout}
@@ -228,20 +258,20 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-card rounded-xl p-6 border border-white/5">
             <p className="text-gray-400 text-sm">Total Products</p>
-            <p className="text-3xl font-bold mt-1">{products.length}</p>
+            <p className="font-display text-3xl font-bold mt-1">{products.length}</p>
           </div>
           <div className="bg-card rounded-xl p-6 border border-white/5">
             <p className="text-gray-400 text-sm">Categories</p>
-            <p className="text-3xl font-bold mt-1">
+            <p className="font-display text-3xl font-bold mt-1">
               {new Set(products.map(p => p.category)).size}
             </p>
           </div>
           <div className="bg-card rounded-xl p-6 border border-white/5">
             <p className="text-gray-400 text-sm">NEW Items</p>
-            <p className="text-3xl font-bold mt-1 text-green-400">
+            <p className="font-display text-3xl font-bold mt-1 text-green-400">
               {products.filter(p => p.status === 'new').length}
             </p>
           </div>
@@ -250,7 +280,7 @@ export default function AdminPage() {
         {!showAddForm && (
           <button
             onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors mb-8"
+            className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors mb-8"
           >
             <Plus className="w-5 h-5" />
             Add Product
@@ -258,132 +288,152 @@ export default function AdminPage() {
         )}
 
         {showAddForm && (
-          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8">
-            <h2 className="text-xl font-bold mb-6">
+          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8 animate-fade-in">
+            <h2 className="font-display text-xl font-bold mb-6">
               {editingProduct ? 'Edit Product' : 'Add New Product'}
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <Tag className="w-4 h-4" /> Product Name
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="e.g. Gucci Chateau Marmont Hoodie"
-                    value={formData.name}
-                    onChange={(e) => updateFormField('name', e.target.value)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
-                  />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <Tag className="w-4 h-4" /> Product Name
+                    </label>
+                    <input
+                      required
+                      type="text"
+                      placeholder="e.g. Gucci Chateau Marmont Hoodie"
+                      value={formData.name}
+                      onChange={(e) => updateFormField('name', e.target.value)}
+                      className={inputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <DollarSign className="w-4 h-4" /> Price (USD)
+                    </label>
+                    <input
+                      required
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="65.00"
+                      value={formData.price}
+                      onChange={(e) => updateFormField('price', e.target.value)}
+                      className={inputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <Tag className="w-4 h-4" /> Category
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => updateFormField('category', e.target.value)}
+                      className={inputClass}
+                    >
+                      {CATEGORIES.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" /> Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) => updateFormField('status', e.target.value as ProductStatus)}
+                      className={inputClass}
+                    >
+                      {STATUSES.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4" /> Image URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      value={formData.image_url}
+                      onChange={(e) => updateFormField('image_url', e.target.value)}
+                      className={inputClass}
+                    />
+                    <p className="text-xs text-gray-500">
+                      Upload to Imgur, Postimages, or Cloudinary and paste the direct link
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <LinkIcon className="w-4 h-4" /> Superbuy Affiliate Link
+                    </label>
+                    <input
+                      required
+                      type="url"
+                      placeholder="https://www.superbuy.com/..."
+                      value={formData.affiliate_link}
+                      onChange={(e) => updateFormField('affiliate_link', e.target.value)}
+                      className={inputClass}
+                    />
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm text-gray-400 flex items-center gap-2">
+                      <FileText className="w-4 h-4" /> Description (optional)
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Shipping info, sizing notes, etc."
+                      value={formData.description}
+                      onChange={(e) => updateFormField('description', e.target.value)}
+                      className={`${inputClass} resize-none`}
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <DollarSign className="w-4 h-4" /> Price (USD)
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="65.00"
-                    value={formData.price}
-                    onChange={(e) => updateFormField('price', e.target.value)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <Tag className="w-4 h-4" /> Category
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => updateFormField('category', e.target.value)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500"
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors"
                   >
-                    {CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" /> Status
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => updateFormField('status', e.target.value as ProductStatus)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500"
+                    {editingProduct ? 'Update Product' : 'Add Product'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
                   >
-                    {STATUSES.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
+                    Cancel
+                  </button>
                 </div>
+              </form>
 
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" /> Image URL
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://example.com/image.jpg (paste image link here)"
-                    value={formData.image_url}
-                    onChange={(e) => updateFormField('image_url', e.target.value)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
-                  />
-                  <p className="text-xs text-gray-500">
-                    Tip: Upload images to Imgur, Postimages, or Cloudinary and paste the direct link here
-                  </p>
+              <div>
+                <div className="flex items-center gap-2 mb-4 text-gray-400 text-sm">
+                  <Eye className="w-4 h-4" />
+                  Live Preview
                 </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <LinkIcon className="w-4 h-4" /> Superbuy Affiliate Link
-                  </label>
-                  <input
-                    required
-                    type="url"
-                    placeholder="https://www.superbuy.com/..."
-                    value={formData.affiliate_link}
-                    onChange={(e) => updateFormField('affiliate_link', e.target.value)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> Description (optional)
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Available to order before stock is ready. Shipping usually starts later. (7-15 days)"
-                    value={formData.description}
-                    onChange={(e) => updateFormField('description', e.target.value)}
-                    className="w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 resize-none"
-                  />
-                </div>
+                {previewProduct ? (
+                  <div className="max-w-sm">
+                    <ProductCard product={previewProduct} showBuyButton={false} />
+                  </div>
+                ) : (
+                  <div className="max-w-sm bg-card rounded-xl border border-dashed border-white/10 p-8 text-center text-gray-600">
+                    <ImageIcon className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">Start typing to see a preview</p>
+                  </div>
+                )}
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors"
-                >
-                  {editingProduct ? 'Update Product' : 'Add Product'}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         )}
 
@@ -416,9 +466,9 @@ export default function AdminPage() {
                     <tr key={product.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4">
                         {product.image_url ? (
-                          <img src={product.image_url} alt="" className="w-12 h-12 rounded object-cover" />
+                          <img src={product.image_url} alt="" className="w-12 h-12 rounded-lg object-cover" />
                         ) : (
-                          <div className="w-12 h-12 rounded bg-gray-800 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center">
                             <ImageIcon className="w-5 h-5 text-gray-600" />
                           </div>
                         )}
@@ -429,22 +479,13 @@ export default function AdminPage() {
                         <span className="px-2 py-1 bg-white/10 rounded text-xs">{product.category}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          product.status === 'new' ? 'bg-green-500/20 text-green-400' :
-                          product.status === 'in-stock' ? 'bg-blue-500/20 text-blue-400' :
-                          product.status === 'pre-order' ? 'bg-yellow-500/20 text-yellow-400' :
-                          'bg-red-500/20 text-red-400'
-                        }`}>
-                          {product.status === 'new' ? 'NEW' :
-                           product.status === 'in-stock' ? 'In Stock' :
-                           product.status === 'pre-order' ? 'Pre-Order' : 'Sold Out'}
-                        </span>
+                        <ProductStatusBadge status={product.status} />
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => startEdit(product)}
-                            className="p-2 hover:bg-blue-600/20 text-blue-400 rounded-lg transition-colors"
+                            className="p-2 hover:bg-accent/20 text-accent rounded-lg transition-colors"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -481,6 +522,10 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
     </div>
   )
 }

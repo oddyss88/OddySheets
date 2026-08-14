@@ -16,7 +16,7 @@ export default function CategoryFilter({ categories, selected, onSelect }: Categ
           className={cn(
             'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all',
             selected === category
-              ? 'bg-blue-600 text-white'
+              ? 'bg-accent text-white'
               : 'bg-card text-gray-400 hover:text-white hover:bg-white/10'
           )}
         >

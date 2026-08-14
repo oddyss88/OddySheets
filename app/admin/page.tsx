@@ -4,12 +4,13 @@ import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Product, ProductStatus } from '@/types/product'
 import { CATEGORIES } from '@/lib/constants'
+import { parseProductsCSV } from '@/lib/csv'
 import ProductCard from '@/components/ProductCard'
 import ProductStatusBadge from '@/components/ProductStatusBadge'
 import Toast from '@/components/Toast'
 import {
   ArrowLeft, Plus, Trash2, Edit2, LogOut, ImageIcon,
-  Link as LinkIcon, DollarSign, Tag, FileText, AlertCircle, Eye,
+  Link as LinkIcon, DollarSign, Tag, FileText, AlertCircle, Eye, Upload,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -61,6 +62,9 @@ export default function AdminPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM)
   const [toast, setToast] = useState<ToastState | null>(null)
+  const [showCsvImport, setShowCsvImport] = useState(false)
+  const [csvText, setCsvText] = useState('')
+  const [csvImporting, setCsvImporting] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -183,6 +187,36 @@ export default function AdminPage() {
     }
   }
 
+  async function handleCsvImport() {
+    const { rows, errors } = parseProductsCSV(csvText)
+
+    if (rows.length === 0) {
+      setToast({ message: errors[0] || 'No valid rows found in CSV', type: 'error' })
+      return
+    }
+
+    setCsvImporting(true)
+    try {
+      const { error } = await supabase.from('products').insert(rows)
+      if (error) throw error
+
+      setToast({
+        message: `Imported ${rows.length} product${rows.length === 1 ? '' : 's'}${
+          errors.length ? ` (${errors.length} row${errors.length === 1 ? '' : 's'} skipped)` : ''
+        }`,
+        type: 'success',
+      })
+      setCsvText('')
+      setShowCsvImport(false)
+      fetchProducts()
+    } catch (error) {
+      console.error('Error importing CSV:', error)
+      setToast({ message: 'Failed to import CSV', type: 'error' })
+    } finally {
+      setCsvImporting(false)
+    }
+  }
+
   function resetForm() {
     setFormData(EMPTY_FORM)
     setShowAddForm(false)
@@ -295,13 +329,56 @@ export default function AdminPage() {
         </div>
 
         {!showAddForm && (
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors mb-8"
-          >
-            <Plus className="w-5 h-5" />
-            Add Product
-          </button>
+          <div className="flex flex-wrap gap-3 mb-8">
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              Add Product
+            </button>
+            <button
+              onClick={() => setShowCsvImport(v => !v)}
+              className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+            >
+              <Upload className="w-5 h-5" />
+              Bulk Import (CSV)
+            </button>
+          </div>
+        )}
+
+        {showCsvImport && !showAddForm && (
+          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8 animate-fade-in space-y-4">
+            <div>
+              <h2 className="font-display text-xl font-bold mb-1">Bulk Import (CSV)</h2>
+              <p className="text-sm text-gray-500">
+                First row must be a header with column names. Required: <code className="text-gray-400">name, price, category, affiliate_link</code>.
+                Optional: <code className="text-gray-400">image_url, status, description</code>. One row per line.
+              </p>
+            </div>
+            <textarea
+              rows={8}
+              placeholder={'name,price,category,affiliate_link,image_url,status,description\nGucci Hoodie,65.00,Hoodies,https://superbuy.com/...,https://...jpg,new,Runs true to size'}
+              value={csvText}
+              onChange={(e) => setCsvText(e.target.value)}
+              className={`${inputClass} font-mono text-xs resize-none`}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleCsvImport}
+                disabled={csvImporting || !csvText.trim()}
+                className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors"
+              >
+                {csvImporting ? 'Importing...' : 'Import'}
+              </button>
+              <button
+                onClick={() => { setShowCsvImport(false); setCsvText('') }}
+                className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
 
         {showAddForm && (

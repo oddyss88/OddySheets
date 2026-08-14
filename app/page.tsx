@@ -11,11 +11,13 @@ import SearchBar from '@/components/SearchBar'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import FeaturedRow from '@/components/FeaturedRow'
+import TrendingRow from '@/components/TrendingRow'
 import ProductToolbar from '@/components/ProductToolbar'
 import EmptyState from '@/components/EmptyState'
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([])
+  const [trendingProducts, setTrendingProducts] = useState<Product[]>([])
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sort, setSort] = useState<SortOption>('newest')
@@ -24,6 +26,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts()
+    fetchTrending()
   }, [])
 
   const featuredProducts = useMemo(
@@ -62,6 +65,11 @@ export default function Home() {
     }
   }
 
+  async function fetchTrending() {
+    const { data, error } = await supabase.from('trending_products').select('*').limit(8)
+    if (!error) setTrendingProducts(data || [])
+  }
+
   function getEmptyVariant(): 'no-products' | 'no-results' | 'filtered-category' {
     if (products.length === 0) return 'no-products'
     if (searchQuery) return 'no-results'
@@ -76,8 +84,12 @@ export default function Home() {
 
       {showFeatured && <FeaturedRow products={featuredProducts} />}
 
+      {!searchQuery && selectedCategory === 'All' && (
+        <TrendingRow products={trendingProducts} />
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <SearchBar value={searchQuery} onChange={setSearchQuery} products={products} />
         <CategoryFilter
           categories={[...STORE_CATEGORIES]}
           selected={selectedCategory}

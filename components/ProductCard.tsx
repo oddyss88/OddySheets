@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { Product } from '@/types/product'
 import ProductStatusBadge from '@/components/ProductStatusBadge'
-import { ExternalLink, Tag } from 'lucide-react'
+import { ExternalLink, Tag, Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useWishlist } from '@/lib/wishlist'
+import { logProductClick } from '@/lib/analytics'
 
 interface ProductCardProps {
   product: Product
@@ -16,11 +18,13 @@ export default function ProductCard({
   showBuyButton = true,
 }: ProductCardProps) {
   const isFeatured = variant === 'featured'
+  const { isWishlisted, toggleWishlist } = useWishlist()
+  const wishlisted = isWishlisted(product.id)
 
   return (
     <div
       className={cn(
-        'bg-card rounded-xl overflow-hidden border border-white/5 hover:border-white/15 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5 group flex flex-col h-full animate-fade-in',
+        'relative bg-card rounded-xl overflow-hidden border border-white/5 hover:border-white/15 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5 group flex flex-col h-full animate-fade-in',
         isFeatured && 'hover:shadow-accent/10'
       )}
     >
@@ -44,6 +48,23 @@ export default function ProductCard({
           )}
         </div>
       </Link>
+
+      {showBuyButton && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            toggleWishlist(product.id)
+          }}
+          aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          className={cn(
+            'absolute top-3 left-3 p-2 rounded-full backdrop-blur-md transition-colors',
+            wishlisted ? 'bg-accent text-white' : 'bg-black/40 text-white hover:bg-black/60'
+          )}
+        >
+          <Heart className={cn('w-4 h-4', wishlisted && 'fill-current')} />
+        </button>
+      )}
 
       <div className="p-4 space-y-3 flex flex-col flex-1">
         <Link href={`/product/${product.id}`}>
@@ -74,7 +95,8 @@ export default function ProductCard({
           <a
             href={product.affiliate_link}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer sponsored"
+            onClick={() => logProductClick(product.id)}
             className="flex items-center justify-center gap-2 w-full py-2.5 bg-accent hover:bg-accent/90 text-white rounded-lg transition-colors font-medium text-sm mt-auto"
           >
             <ExternalLink className="w-4 h-4" />

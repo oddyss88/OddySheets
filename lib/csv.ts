@@ -13,7 +13,7 @@ export interface ParsedProductRow {
 const REQUIRED_COLUMNS = ['name', 'price', 'category', 'affiliate_link'] as const
 const VALID_STATUSES: ProductStatus[] = ['new', 'in-stock', 'pre-order', 'sold-out']
 
-function parseCSVLine(line: string): string[] {
+export function parseCSVLine(line: string): string[] {
   const result: string[] = []
   let current = ''
   let inQuotes = false
@@ -44,11 +44,27 @@ function parseCSVLine(line: string): string[] {
   return result
 }
 
-export function parseProductsCSV(csv: string): { rows: ParsedProductRow[]; errors: string[] } {
+export function parseCSVRows(csv: string): { header: string[]; records: Record<string, string>[] } {
   const lines = csv.split(/\r?\n/).filter(line => line.trim().length > 0)
-  if (lines.length === 0) return { rows: [], errors: ['CSV is empty'] }
+  if (lines.length === 0) return { header: [], records: [] }
 
   const header = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase())
+  const records = lines.slice(1).map(line => {
+    const values = parseCSVLine(line)
+    const record: Record<string, string> = {}
+    header.forEach((col, idx) => {
+      record[col] = (values[idx] ?? '').trim()
+    })
+    return record
+  })
+
+  return { header, records }
+}
+
+export function parseProductsCSV(csv: string): { rows: ParsedProductRow[]; errors: string[] } {
+  const { header, records } = parseCSVRows(csv)
+  if (header.length === 0) return { rows: [], errors: ['CSV is empty'] }
+
   const missing = REQUIRED_COLUMNS.filter(col => !header.includes(col))
   if (missing.length > 0) {
     return { rows: [], errors: [`Missing required column(s): ${missing.join(', ')}`] }
@@ -57,22 +73,18 @@ export function parseProductsCSV(csv: string): { rows: ParsedProductRow[]; error
   const rows: ParsedProductRow[] = []
   const errors: string[] = []
 
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i])
-    const record: Record<string, string> = {}
-    header.forEach((col, idx) => {
-      record[col] = (values[idx] ?? '').trim()
-    })
+  records.forEach((record, i) => {
+    const rowNum = i + 2
 
     if (!record.name || !record.affiliate_link) {
-      errors.push(`Row ${i + 1}: missing name or affiliate_link — skipped`)
-      continue
+      errors.push(`Row ${rowNum}: missing name or affiliate_link — skipped`)
+      return
     }
 
     const price = parseFloat(record.price)
     if (isNaN(price)) {
-      errors.push(`Row ${i + 1}: invalid price "${record.price}" — skipped`)
-      continue
+      errors.push(`Row ${rowNum}: invalid price "${record.price}" — skipped`)
+      return
     }
 
     const status = VALID_STATUSES.includes(record.status as ProductStatus)
@@ -88,7 +100,7 @@ export function parseProductsCSV(csv: string): { rows: ParsedProductRow[]; error
       status,
       description: record.description || '',
     })
-  }
+  })
 
   return { rows, errors }
 }

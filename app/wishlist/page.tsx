@@ -33,7 +33,7 @@ export default function WishlistPage() {
 
   return (
     <main className="min-h-screen bg-dark">
-      <Header showAdmin={false} />
+      <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="font-display text-2xl font-bold mb-8">Your Wishlist</h1>
 

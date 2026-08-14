@@ -4,7 +4,7 @@ import NotFoundView from '@/components/NotFoundView'
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-dark">
-      <Header showAdmin={false} />
+      <Header />
       <NotFoundView />
     </main>
   )

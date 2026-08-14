@@ -60,7 +60,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
   if (loading) {
     return (
       <main className="min-h-screen bg-dark">
-        <Header showAdmin={false} />
+        <Header />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="aspect-square bg-card rounded-2xl animate-pulse border border-white/5" />
@@ -78,7 +78,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
   if (notFound || !product) {
     return (
       <main className="min-h-screen bg-dark">
-        <Header showAdmin={false} />
+        <Header />
         <NotFoundView
           title="Product not found"
           message="This item may have been removed from the catalog."
@@ -89,7 +89,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
 
   return (
     <main className="min-h-screen bg-dark pb-24 md:pb-12">
-      <Header showAdmin={false} />
+      <Header />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">

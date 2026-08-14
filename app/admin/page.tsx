@@ -5,14 +5,22 @@ import { supabase } from '@/lib/supabase'
 import { Product, ProductStatus } from '@/types/product'
 import { CATEGORIES } from '@/lib/constants'
 import { parseProductsCSV } from '@/lib/csv'
+import { SheetRow } from '@/lib/sheet-import'
 import ProductCard from '@/components/ProductCard'
 import ProductStatusBadge from '@/components/ProductStatusBadge'
 import Toast from '@/components/Toast'
+import AdminTrustedLinks from '@/components/AdminTrustedLinks'
 import {
   ArrowLeft, Plus, Trash2, Edit2, LogOut, ImageIcon,
   Link as LinkIcon, DollarSign, Tag, FileText, AlertCircle, Eye, Upload,
+  FileSpreadsheet, CheckCircle2, AlertTriangle, Loader2, Package, ListChecks,
 } from 'lucide-react'
 import Link from 'next/link'
+
+interface ImportRow extends SheetRow {
+  include: boolean
+  imageFetching: boolean
+}
 
 const STATUSES: { value: ProductStatus; label: string }[] = [
   { value: 'new', label: 'NEW' },
@@ -50,6 +58,7 @@ const inputClass =
   'w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors'
 
 export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<'products' | 'links'>('products')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -65,6 +74,12 @@ export default function AdminPage() {
   const [showCsvImport, setShowCsvImport] = useState(false)
   const [csvText, setCsvText] = useState('')
   const [csvImporting, setCsvImporting] = useState(false)
+  const [showSheetImport, setShowSheetImport] = useState(false)
+  const [sheetUrl, setSheetUrl] = useState('')
+  const [sheetFetching, setSheetFetching] = useState(false)
+  const [sheetImporting, setSheetImporting] = useState(false)
+  const [sheetRows, setSheetRows] = useState<ImportRow[]>([])
+  const [sheetErrors, setSheetErrors] = useState<string[]>([])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -217,6 +232,117 @@ export default function AdminPage() {
     }
   }
 
+  async function authHeader(): Promise<Record<string, string>> {
+    const { data: { session } } = await supabase.auth.getSession()
+    return session ? { Authorization: `Bearer ${session.access_token}` } : {}
+  }
+
+  async function fetchRowImage(index: number, url: string) {
+    setSheetRows(prev => prev.map((r, i) => (i === index ? { ...r, imageFetching: true } : r)))
+    try {
+      const res = await fetch('/api/fetch-product-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify({ url }),
+      })
+      const data = await res.json()
+      setSheetRows(prev =>
+        prev.map((r, i) =>
+          i === index ? { ...r, image_url: data.image_url || '', imageFetching: false } : r
+        )
+      )
+    } catch {
+      setSheetRows(prev => prev.map((r, i) => (i === index ? { ...r, imageFetching: false } : r)))
+    }
+  }
+
+  async function fetchImagesForRows(rows: ImportRow[]) {
+    const needsImage = rows
+      .map((row, index) => ({ row, index }))
+      .filter(({ row }) => !row.image_url && row.scrapeUrl)
+
+    const CONCURRENCY = 3
+    for (let i = 0; i < needsImage.length; i += CONCURRENCY) {
+      const batch = needsImage.slice(i, i + CONCURRENCY)
+      await Promise.all(batch.map(({ row, index }) => fetchRowImage(index, row.scrapeUrl!)))
+    }
+  }
+
+  async function handleFetchSheet() {
+    setSheetFetching(true)
+    setSheetRows([])
+    setSheetErrors([])
+    try {
+      const res = await fetch('/api/import-sheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify({ sheetUrl }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setToast({ message: data.error || 'Failed to read sheet', type: 'error' })
+        return
+      }
+
+      const rows: ImportRow[] = (data.rows as SheetRow[]).map(r => ({
+        ...r,
+        include: true,
+        imageFetching: false,
+      }))
+      setSheetRows(rows)
+      setSheetErrors(data.errors || [])
+      fetchImagesForRows(rows)
+    } catch (error) {
+      console.error('Error fetching sheet:', error)
+      setToast({ message: 'Failed to reach the import service', type: 'error' })
+    } finally {
+      setSheetFetching(false)
+    }
+  }
+
+  function toggleRowInclude(index: number) {
+    setSheetRows(prev => prev.map((r, i) => (i === index ? { ...r, include: !r.include } : r)))
+  }
+
+  async function handleImportSheetRows() {
+    const selected = sheetRows.filter(r => r.include)
+    if (selected.length === 0) {
+      setToast({ message: 'No rows selected', type: 'error' })
+      return
+    }
+
+    setSheetImporting(true)
+    try {
+      const { error } = await supabase.from('products').insert(
+        selected.map(r => ({
+          name: r.name,
+          price: r.price,
+          category: r.category,
+          image_url: r.image_url,
+          affiliate_link: r.affiliateLink,
+          status: r.status,
+          description: r.description,
+        }))
+      )
+      if (error) throw error
+
+      setToast({
+        message: `Imported ${selected.length} product${selected.length === 1 ? '' : 's'}`,
+        type: 'success',
+      })
+      setSheetRows([])
+      setSheetUrl('')
+      setShowSheetImport(false)
+      fetchProducts()
+    } catch (error) {
+      console.error('Error importing sheet rows:', error)
+      setToast({ message: 'Failed to import products', type: 'error' })
+    } finally {
+      setSheetImporting(false)
+    }
+  }
+
   function resetForm() {
     setFormData(EMPTY_FORM)
     setShowAddForm(false)
@@ -309,6 +435,37 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-2 mb-8 border-b border-white/10">
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'products'
+                ? 'border-accent text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            Products
+          </button>
+          <button
+            onClick={() => setActiveTab('links')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'links'
+                ? 'border-accent text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <ListChecks className="w-4 h-4" />
+            Trusted Links
+          </button>
+        </div>
+
+        {activeTab === 'links' && (
+          <AdminTrustedLinks onToast={(message, type) => setToast({ message, type })} />
+        )}
+
+        {activeTab === 'products' && (
+        <>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-card rounded-xl p-6 border border-white/5">
             <p className="text-gray-400 text-sm">Total Products</p>
@@ -344,6 +501,13 @@ export default function AdminPage() {
               <Upload className="w-5 h-5" />
               Bulk Import (CSV)
             </button>
+            <button
+              onClick={() => setShowSheetImport(v => !v)}
+              className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+            >
+              <FileSpreadsheet className="w-5 h-5" />
+              Import from Sheet
+            </button>
           </div>
         )}
 
@@ -378,6 +542,126 @@ export default function AdminPage() {
                 Cancel
               </button>
             </div>
+          </div>
+        )}
+
+        {showSheetImport && !showAddForm && (
+          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8 animate-fade-in space-y-4">
+            <div>
+              <h2 className="font-display text-xl font-bold mb-1">Import from Google Sheet</h2>
+              <p className="text-sm text-gray-500">
+                Sheet must be shared as &quot;Anyone with the link can view.&quot; Required columns:{' '}
+                <code className="text-gray-400">name, price, category, link</code>. Optional:{' '}
+                <code className="text-gray-400">image_url, status, description</code>.{' '}
+                <code className="text-gray-400">link</code> can be a Superbuy or Weidian product link —
+                it&apos;s converted to your affiliate link automatically when possible. Missing images
+                are fetched from the product page automatically.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <input
+                type="url"
+                placeholder="https://docs.google.com/spreadsheets/d/..."
+                value={sheetUrl}
+                onChange={(e) => setSheetUrl(e.target.value)}
+                className={inputClass}
+              />
+              <button
+                onClick={handleFetchSheet}
+                disabled={sheetFetching || !sheetUrl.trim()}
+                className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors whitespace-nowrap"
+              >
+                {sheetFetching ? 'Fetching...' : 'Fetch Preview'}
+              </button>
+            </div>
+
+            {sheetErrors.length > 0 && (
+              <div className="text-xs text-yellow-400/80 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-4 py-3 space-y-1">
+                {sheetErrors.map((err, i) => <p key={i}>{err}</p>)}
+              </div>
+            )}
+
+            {sheetRows.length > 0 && (
+              <div className="space-y-4">
+                <div className="border border-white/10 rounded-xl overflow-hidden">
+                  <div className="overflow-x-auto max-h-96">
+                    <table className="w-full">
+                      <thead className="sticky top-0 bg-card">
+                        <tr className="border-b border-white/10">
+                          <th className="px-4 py-3"></th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Image</th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Name</th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Price</th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Category</th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Affiliate Link</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sheetRows.map((row, i) => (
+                          <tr key={i} className="border-b border-white/5">
+                            <td className="px-4 py-3">
+                              <input
+                                type="checkbox"
+                                checked={row.include}
+                                onChange={() => toggleRowInclude(i)}
+                                className="w-4 h-4"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              {row.imageFetching ? (
+                                <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
+                                  <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
+                                </div>
+                              ) : row.image_url ? (
+                                <img src={row.image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                              ) : (
+                                <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
+                                  <ImageIcon className="w-4 h-4 text-gray-600" />
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-sm max-w-[200px] truncate">{row.name}</td>
+                            <td className="px-4 py-3 text-sm">${row.price.toFixed(2)}</td>
+                            <td className="px-4 py-3 text-sm text-gray-400">{row.category}</td>
+                            <td className="px-4 py-3">
+                              {row.linkConverted ? (
+                                <span className="flex items-center gap-1.5 text-xs text-green-400">
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  Affiliate link
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-1.5 text-xs text-yellow-400">
+                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                  Check link
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleImportSheetRows}
+                    disabled={sheetImporting || sheetRows.every(r => !r.include)}
+                    className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors"
+                  >
+                    {sheetImporting
+                      ? 'Importing...'
+                      : `Import ${sheetRows.filter(r => r.include).length} Selected`}
+                  </button>
+                  <button
+                    onClick={() => { setShowSheetImport(false); setSheetRows([]); setSheetUrl('') }}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -615,6 +899,8 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {toast && (

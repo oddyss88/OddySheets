@@ -50,8 +50,10 @@ const inputClass =
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [loginSubmitting, setLoginSubmitting] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -61,13 +63,18 @@ export default function AdminPage() {
   const [toast, setToast] = useState<ToastState | null>(null)
 
   useEffect(() => {
-    const auth = localStorage.getItem('admin_auth')
-    if (auth === 'true') {
-      setIsAuthenticated(true)
-      fetchProducts()
-    } else {
-      setLoading(false)
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session)
+      if (session) fetchProducts()
+      else setLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session)
+      if (session) fetchProducts()
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   useEffect(() => {
@@ -107,22 +114,22 @@ export default function AdminPage() {
     }
   }
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
-    if (password === adminPassword) {
-      localStorage.setItem('admin_auth', 'true')
-      setIsAuthenticated(true)
-      setLoginError('')
-      fetchProducts()
+    setLoginError('')
+    setLoginSubmitting(true)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setLoginSubmitting(false)
+    if (error) {
+      setLoginError('Wrong email or password')
     } else {
-      setLoginError('Wrong password')
+      setPassword('')
     }
   }
 
-  function handleLogout() {
-    localStorage.removeItem('admin_auth')
-    setIsAuthenticated(false)
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    setEmail('')
     setPassword('')
   }
 
@@ -211,7 +218,16 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <input
+              type="email"
+              autoComplete="username"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputClass}
+            />
+            <input
               type="password"
+              autoComplete="current-password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -225,9 +241,10 @@ export default function AdminPage() {
             )}
             <button
               type="submit"
-              className="w-full py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors"
+              disabled={loginSubmitting}
+              className="w-full py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors"
             >
-              Login
+              {loginSubmitting ? 'Signing in...' : 'Login'}
             </button>
           </form>
         </div>

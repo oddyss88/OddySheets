@@ -43,7 +43,9 @@ export function filterProducts(
     filtered = filtered.filter(p => p.status !== 'sold-out')
   }
 
-  if (options.category && options.category !== 'All') {
+  if (options.category === 'New') {
+    filtered = filtered.filter(p => p.status === 'new')
+  } else if (options.category && options.category !== 'All') {
     filtered = filtered.filter(p => p.category === options.category)
   }
 

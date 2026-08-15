@@ -2,62 +2,23 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ShoppingBag, Menu, Heart, Store, UserCheck, ShieldCheck, ExternalLink } from 'lucide-react'
+import { ShoppingBag, Menu, Heart, Store, UserCheck, ShieldCheck } from 'lucide-react'
 import { useWishlist } from '@/lib/wishlist'
-import { fetchSiteSettings } from '@/lib/settings'
-import { LinkEntry } from '@/types/settings'
 
 interface HeaderProps {
   showMenu?: boolean
 }
 
-function LinkList({ entries }: { entries: LinkEntry[] }) {
-  if (entries.length === 0) {
-    return <p className="px-3 py-2 text-xs text-gray-500">None added yet</p>
-  }
-
-  return (
-    <ul className="space-y-0.5">
-      {entries.map((entry) => (
-        <li key={entry.id}>
-          <a
-            href={entry.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors group"
-          >
-            <span className="min-w-0">
-              <span className="block text-sm font-medium truncate group-hover:text-accent transition-colors">
-                {entry.name}
-              </span>
-              {entry.note && (
-                <span className="block text-xs text-gray-500 truncate">{entry.note}</span>
-              )}
-            </span>
-            <ExternalLink className="w-3.5 h-3.5 text-gray-600 shrink-0" />
-          </a>
-        </li>
-      ))}
-    </ul>
-  )
-}
+const MENU_LINKS = [
+  { href: '/sellers', label: 'Trusted Yupoo Sellers', icon: Store },
+  { href: '/agents', label: 'Trusted Agents', icon: UserCheck },
+  { href: '/admin', label: 'Admin Panel', icon: ShieldCheck },
+]
 
 export default function Header({ showMenu = true }: HeaderProps) {
   const { ids } = useWishlist()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [loaded, setLoaded] = useState(false)
-  const [sellers, setSellers] = useState<LinkEntry[]>([])
-  const [agents, setAgents] = useState<LinkEntry[]>([])
   const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!menuOpen || loaded) return
-    fetchSiteSettings().then((settings) => {
-      setSellers(settings.yupoo_sellers)
-      setAgents(settings.trusted_agents)
-      setLoaded(true)
-    })
-  }, [menuOpen, loaded])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -102,41 +63,18 @@ export default function Header({ showMenu = true }: HeaderProps) {
                 </button>
 
                 {menuOpen && (
-                  <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-card border border-white/10 rounded-xl shadow-lg overflow-hidden animate-fade-in z-[70]">
-                    <div className="p-3 border-b border-white/5">
-                      <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                        <Store className="w-3.5 h-3.5" />
-                        Trusted Yupoo Sellers
-                      </div>
-                      {!loaded ? (
-                        <p className="px-3 py-2 text-xs text-gray-500">Loading...</p>
-                      ) : (
-                        <LinkList entries={sellers} />
-                      )}
-                    </div>
-
-                    <div className="p-3 border-b border-white/5">
-                      <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                        <UserCheck className="w-3.5 h-3.5" />
-                        Trusted Agents
-                      </div>
-                      {!loaded ? (
-                        <p className="px-3 py-2 text-xs text-gray-500">Loading...</p>
-                      ) : (
-                        <LinkList entries={agents} />
-                      )}
-                    </div>
-
-                    <div className="p-3">
+                  <div className="absolute right-0 mt-2 w-64 bg-card border border-white/10 rounded-xl shadow-lg overflow-hidden animate-fade-in z-[70] p-2">
+                    {MENU_LINKS.map(({ href, label, icon: Icon }) => (
                       <Link
-                        href="/admin"
+                        key={href}
+                        href={href}
                         onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-sm font-medium text-gray-300"
+                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 transition-colors text-sm font-medium text-gray-300 hover:text-white"
                       >
-                        <ShieldCheck className="w-4 h-4" />
-                        Admin Panel
+                        <Icon className="w-4 h-4" />
+                        {label}
                       </Link>
-                    </div>
+                    ))}
                   </div>
                 )}
               </div>

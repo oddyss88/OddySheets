@@ -23,7 +23,9 @@ export default function EmptyState({ variant, category }: EmptyStateProps) {
     return (
       <div className="text-center py-20 animate-fade-in">
         <ShoppingBag className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-        <p className="text-gray-300 text-lg font-medium">No drops in {category} yet</p>
+        <p className="text-gray-300 text-lg font-medium">
+          {category === 'New' ? 'No new arrivals right now' : `No drops in ${category} yet`}
+        </p>
         <p className="text-gray-600 text-sm mt-2">
           Check back soon — new items are added regularly
         </p>

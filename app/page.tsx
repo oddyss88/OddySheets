@@ -1,38 +1,63 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { Suspense, useState, useEffect, useMemo } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Product } from '@/types/product'
-import { STORE_CATEGORIES, SortOption } from '@/lib/constants'
+import { FILTER_CATEGORIES, CATEGORIES, SortOption } from '@/lib/constants'
 import { filterProducts, sortProducts } from '@/lib/product-utils'
 import ProductCard from '@/components/ProductCard'
 import CategoryFilter from '@/components/CategoryFilter'
 import SearchBar from '@/components/SearchBar'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
-import FeaturedRow from '@/components/FeaturedRow'
 import TrendingRow from '@/components/TrendingRow'
 import ProductToolbar from '@/components/ProductToolbar'
 import EmptyState from '@/components/EmptyState'
 
-export default function Home() {
+const PAGE_SIZE = 24
+
+function HomeContent() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const [products, setProducts] = useState<Product[]>([])
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([])
-  const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sort, setSort] = useState<SortOption>('newest')
   const [hideSoldOut, setHideSoldOut] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
+
+  const selectedCategory = useMemo(() => {
+    if (searchParams.get('status') === 'new') return 'New'
+    const category = searchParams.get('category')
+    if (category && (CATEGORIES as readonly string[]).includes(category)) return category
+    return 'All'
+  }, [searchParams])
 
   useEffect(() => {
     fetchProducts()
     fetchTrending()
   }, [])
 
-  const featuredProducts = useMemo(
-    () => products.filter(p => p.status === 'new').slice(0, 8),
-    [products]
-  )
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [selectedCategory, searchQuery, sort, hideSoldOut])
+
+  function handleSelectCategory(category: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('category')
+    params.delete('status')
+    if (category === 'New') {
+      params.set('status', 'new')
+    } else if (category !== 'All') {
+      params.set('category', category)
+    }
+    const query = params.toString()
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false })
+  }
 
   const filteredProducts = useMemo(() => {
     const filtered = filterProducts(products, {
@@ -43,11 +68,11 @@ export default function Home() {
     return sortProducts(filtered, sort)
   }, [products, selectedCategory, searchQuery, hideSoldOut, sort])
 
-  const showFeatured =
-    !loading &&
-    featuredProducts.length > 0 &&
-    selectedCategory === 'All' &&
-    !searchQuery
+  const visibleProducts = filteredProducts.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredProducts.length
+
+  const gridHeading =
+    selectedCategory === 'New' ? 'New Arrivals' : selectedCategory === 'All' ? 'All Products' : selectedCategory
 
   async function fetchProducts() {
     try {
@@ -82,18 +107,12 @@ export default function Home() {
       <Header />
       <Hero />
 
-      {showFeatured && <FeaturedRow products={featuredProducts} />}
-
-      {!searchQuery && selectedCategory === 'All' && (
-        <TrendingRow products={trendingProducts} />
-      )}
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         <SearchBar value={searchQuery} onChange={setSearchQuery} products={products} />
         <CategoryFilter
-          categories={[...STORE_CATEGORIES]}
+          categories={[...FILTER_CATEGORIES]}
           selected={selectedCategory}
-          onSelect={setSelectedCategory}
+          onSelect={handleSelectCategory}
         />
         {!loading && products.length > 0 && (
           <ProductToolbar
@@ -121,14 +140,9 @@ export default function Home() {
           <EmptyState variant={getEmptyVariant()} category={selectedCategory} />
         ) : (
           <>
-            {!showFeatured && (
-              <h2 className="font-display text-xl font-bold mb-6">All Products</h2>
-            )}
-            {showFeatured && (
-              <h2 className="font-display text-xl font-bold mb-6">All Products</h2>
-            )}
+            <h2 className="font-display text-xl font-bold mb-6">{gridHeading}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product, i) => (
+              {visibleProducts.map((product, i) => (
                 <div
                   key={product.id}
                   className="animate-fade-in"
@@ -138,9 +152,31 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            {hasMore && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  className="px-8 py-3 bg-card hover:bg-white/10 border border-white/10 rounded-xl font-medium transition-colors text-sm"
+                >
+                  Load More ({filteredProducts.length - visibleCount} remaining)
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
+
+      {!searchQuery && selectedCategory === 'All' && (
+        <TrendingRow products={trendingProducts} />
+      )}
     </main>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-dark" />}>
+      <HomeContent />
+    </Suspense>
   )
 }

@@ -6,6 +6,8 @@ export const CATEGORIES = [
 
 export const STORE_CATEGORIES = ['All', ...CATEGORIES] as const
 
+export const FILTER_CATEGORIES = ['All', 'New', ...CATEGORIES] as const
+
 export type SortOption = 'newest' | 'price-asc' | 'price-desc'
 
 export const SORT_OPTIONS: { value: SortOption; label: string }[] = [

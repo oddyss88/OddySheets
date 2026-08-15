@@ -11,7 +11,7 @@ export default function ProductStatusBadge({ status, className }: ProductStatusB
   return (
     <span
       className={cn(
-        'px-2 py-1 text-xs font-medium rounded border',
+        'px-2 py-1 text-[10px] font-mono uppercase tracking-wide border',
         STATUS_COLORS[status],
         className
       )}

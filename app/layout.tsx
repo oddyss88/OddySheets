@@ -1,16 +1,30 @@
 import type { Metadata } from 'next'
-import { Inter, Syne } from 'next/font/google'
+import { Archivo, Oswald, Bebas_Neue, IBM_Plex_Mono } from 'next/font/google'
 import PromoBar from '@/components/PromoBar'
 import './globals.css'
 
-const inter = Inter({
+const archivo = Archivo({
   subsets: ['latin'],
-  variable: '--font-inter',
+  weight: ['400', '500', '600'],
+  variable: '--font-body',
 })
 
-const syne = Syne({
+const oswald = Oswald({
   subsets: ['latin'],
-  variable: '--font-syne',
+  weight: ['500', '600', '700'],
+  variable: '--font-heading',
+})
+
+const bebasNeue = Bebas_Neue({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-display',
+})
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-mono',
 })
 
 export const metadata: Metadata = {
@@ -36,7 +50,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${syne.variable} font-sans bg-dark text-white min-h-screen`}>
+      <body
+        className={`${archivo.variable} ${oswald.variable} ${bebasNeue.variable} ${plexMono.variable} font-sans bg-dark text-ink min-h-screen`}
+      >
         <PromoBar />
         {children}
       </body>

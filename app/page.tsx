@@ -131,7 +131,7 @@ function HomeContent() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-card rounded-xl h-[420px] animate-pulse border border-white/5"
+                className="bg-card h-[420px] animate-pulse border border-line"
                 style={{ animationDelay: `${i * 75}ms` }}
               />
             ))}
@@ -140,7 +140,7 @@ function HomeContent() {
           <EmptyState variant={getEmptyVariant()} category={selectedCategory} />
         ) : (
           <>
-            <h2 className="font-display text-xl font-bold mb-6">{gridHeading}</h2>
+            <h2 className="font-heading uppercase tracking-wide text-xl text-paper mb-6">{gridHeading}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleProducts.map((product, i) => (
                 <div
@@ -156,9 +156,9 @@ function HomeContent() {
               <div className="flex justify-center mt-10">
                 <button
                   onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                  className="px-8 py-3 bg-card hover:bg-white/10 border border-white/10 rounded-xl font-medium transition-colors text-sm"
+                  className="px-8 py-3 bg-card hover:border-accent border border-line font-heading uppercase tracking-wide transition-colors text-sm text-paper"
                 >
-                  Load More ({filteredProducts.length - visibleCount} remaining)
+                  Load more ({filteredProducts.length - visibleCount} remaining)
                 </button>
               </div>
             )}

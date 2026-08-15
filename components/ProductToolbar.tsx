@@ -18,31 +18,31 @@ export default function ProductToolbar({
   resultCount,
 }: ProductToolbarProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <p className="text-sm text-gray-500">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-line pt-3">
+      <p className="text-sm font-mono text-muted">
         {resultCount} {resultCount === 1 ? 'item' : 'items'}
       </p>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button
           onClick={() => onHideSoldOutChange(!hideSoldOut)}
           className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border',
+            'flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wide transition-colors border',
             hideSoldOut
-              ? 'bg-accent/20 text-accent border-accent/30'
-              : 'bg-card text-gray-400 border-white/10 hover:text-white hover:border-white/20'
+              ? 'bg-accent/10 text-accent border-accent/50'
+              : 'bg-card text-muted border-line hover:text-paper hover:border-muted'
           )}
         >
-          <EyeOff className="w-4 h-4" />
+          <EyeOff className="w-3.5 h-3.5" />
           Hide sold out
         </button>
 
         <div className="relative">
-          <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+          <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
           <select
             value={sort}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="pl-9 pr-4 py-2 bg-card border border-white/10 rounded-lg text-sm text-white appearance-none cursor-pointer focus:outline-none focus:border-accent transition-colors"
+            className="pl-9 pr-4 py-2 bg-card border border-line text-xs font-heading uppercase tracking-wide text-paper appearance-none cursor-pointer focus:outline-none focus:border-accent transition-colors"
           >
             {SORT_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>

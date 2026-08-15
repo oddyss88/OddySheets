@@ -2,10 +2,10 @@ import { Product, ProductStatus } from '@/types/product'
 import { SortOption } from '@/lib/constants'
 
 export const STATUS_COLORS: Record<ProductStatus, string> = {
-  new: 'bg-green-500/20 text-green-400 border-green-500/30',
-  'in-stock': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  'pre-order': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  'sold-out': 'bg-red-500/20 text-red-400 border-red-500/30',
+  new: 'bg-accent2/10 text-accent2 border-accent2/40',
+  'in-stock': 'bg-accent/10 text-accent border-accent/40',
+  'pre-order': 'bg-line/40 text-muted border-line',
+  'sold-out': 'bg-brick/10 text-brick border-brick/40',
 }
 
 export const STATUS_LABELS: Record<ProductStatus, string> = {

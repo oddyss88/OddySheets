@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Product } from '@/types/product'
 import ProductStatusBadge from '@/components/ProductStatusBadge'
-import { ExternalLink, Tag, Heart } from 'lucide-react'
+import { Tag, Heart, ArrowUpRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useWishlist } from '@/lib/wishlist'
 import { logProductClick } from '@/lib/analytics'
@@ -22,28 +22,23 @@ export default function ProductCard({
   const wishlisted = isWishlisted(product.id)
 
   return (
-    <div
-      className={cn(
-        'relative bg-card rounded-xl overflow-hidden border border-white/5 hover:border-white/15 transition-all duration-300 hover:shadow-lg hover:shadow-accent/5 group flex flex-col h-full animate-fade-in',
-        isFeatured && 'hover:shadow-accent/10'
-      )}
-    >
+    <div className="relative bg-card border border-line hover:border-accent transition-colors duration-200 group flex flex-col h-full animate-fade-in">
       <Link href={`/product/${product.id}`} className="block">
-        <div className="relative aspect-square bg-gray-900 overflow-hidden">
+        <div className="relative aspect-square bg-paper m-2 border border-line overflow-hidden">
           {product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-contain p-3"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-600">
+            <div className="w-full h-full flex items-center justify-center text-line">
               <Tag className="w-12 h-12" />
             </div>
           )}
           {product.status === 'new' && (
-            <span className="absolute top-3 right-3 px-2 py-1 bg-green-500 text-black text-xs font-bold rounded">
-              NEW
+            <span className="absolute top-2 right-2 px-2 py-0.5 bg-card border border-accent2 text-accent2 text-[10px] font-mono uppercase tracking-wide -rotate-3">
+              New
             </span>
           )}
         </div>
@@ -58,19 +53,21 @@ export default function ProductCard({
           }}
           aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           className={cn(
-            'absolute top-3 left-3 p-2 rounded-full backdrop-blur-md transition-colors',
-            wishlisted ? 'bg-accent text-white' : 'bg-black/40 text-white hover:bg-black/60'
+            'absolute top-4 left-4 p-1.5 border transition-colors',
+            wishlisted
+              ? 'bg-accent border-accent text-paper'
+              : 'bg-dark/80 border-line text-ink hover:border-accent'
           )}
         >
-          <Heart className={cn('w-4 h-4', wishlisted && 'fill-current')} />
+          <Heart className={cn('w-3.5 h-3.5', wishlisted && 'fill-current')} />
         </button>
       )}
 
-      <div className="p-4 space-y-3 flex flex-col flex-1">
+      <div className="p-4 space-y-2.5 flex flex-col flex-1">
         <Link href={`/product/${product.id}`}>
           <h3
             className={cn(
-              'font-semibold text-white line-clamp-2 leading-tight hover:text-accent transition-colors',
+              'font-heading uppercase tracking-wide text-paper line-clamp-2 leading-tight hover:text-accent transition-colors',
               isFeatured ? 'text-base' : 'text-sm'
             )}
           >
@@ -79,14 +76,19 @@ export default function ProductCard({
         </Link>
 
         <div className="flex items-center justify-between">
-          <span className={cn('font-bold text-white', isFeatured ? 'text-2xl' : 'text-xl')}>
+          <span
+            className={cn(
+              'font-mono tabular-nums text-paper',
+              isFeatured ? 'text-xl' : 'text-lg'
+            )}
+          >
             ${product.price.toFixed(2)}
           </span>
           <ProductStatusBadge status={product.status} />
         </div>
 
         {product.description && (
-          <p className="text-gray-400 text-xs line-clamp-2 flex-1">
+          <p className="text-muted text-xs line-clamp-2 flex-1">
             {product.description}
           </p>
         )}
@@ -97,10 +99,10 @@ export default function ProductCard({
             target="_blank"
             rel="noopener noreferrer sponsored"
             onClick={() => logProductClick(product.id)}
-            className="flex items-center justify-center gap-2 w-full py-2.5 bg-accent hover:bg-accent/90 text-white rounded-lg transition-colors font-medium text-sm mt-auto"
+            className="flex items-center justify-center gap-1.5 w-full py-2.5 bg-accent hover:bg-accent/90 text-paper transition-colors font-heading uppercase tracking-wide text-sm mt-auto"
           >
-            <ExternalLink className="w-4 h-4" />
             Buy
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
         )}
       </div>

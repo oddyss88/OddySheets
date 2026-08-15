@@ -33,18 +33,18 @@ export default function SearchBar({ value, onChange, products = [] }: SearchBarP
 
   return (
     <div ref={containerRef} className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
       <input
         type="text"
         placeholder="Search products..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
-        className="w-full pl-10 pr-4 py-3 bg-card border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-accent transition-colors"
+        className="w-full pl-10 pr-4 py-3 bg-card border border-line text-paper placeholder-muted focus:outline-none focus:border-accent transition-colors"
       />
 
       {suggestions.length > 0 && (
-        <div className="absolute z-40 top-full mt-2 w-full bg-card border border-white/10 rounded-xl overflow-hidden shadow-xl">
+        <div className="absolute z-40 top-full mt-1 w-full bg-card border border-line overflow-hidden">
           {suggestions.map(product => (
             <button
               key={product.id}
@@ -54,15 +54,15 @@ export default function SearchBar({ value, onChange, products = [] }: SearchBarP
                 onChange('')
                 router.push(`/product/${product.id}`)
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-line/40 transition-colors text-left border-b border-line last:border-b-0"
             >
-              <div className="w-10 h-10 rounded-lg bg-gray-900 overflow-hidden shrink-0">
+              <div className="w-10 h-10 bg-paper overflow-hidden shrink-0">
                 {product.image_url && (
-                  <img src={product.image_url} alt="" className="w-full h-full object-cover" />
+                  <img src={product.image_url} alt="" className="w-full h-full object-contain" />
                 )}
               </div>
-              <span className="flex-1 text-sm text-white truncate">{product.name}</span>
-              <span className="text-sm text-gray-400">${product.price.toFixed(2)}</span>
+              <span className="flex-1 text-sm text-paper truncate">{product.name}</span>
+              <span className="text-sm font-mono text-muted">${product.price.toFixed(2)}</span>
             </button>
           ))}
         </div>

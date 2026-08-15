@@ -25,16 +25,16 @@ export default function PromoBar() {
   const banner = PROMO_BANNERS[index]
 
   return (
-    <div className="sticky top-0 z-[60] h-9 flex items-center justify-center gap-2 bg-accent px-4 text-white">
+    <div className="sticky top-0 z-[60] h-9 flex items-center justify-center gap-2 bg-accent px-4 text-paper">
       <Gift className="w-3.5 h-3.5 shrink-0" />
-      <span key={banner.id} className="truncate text-xs sm:text-sm font-medium animate-fade-in">
-        {banner.message} <strong>{banner.highlight}</strong>
+      <span key={banner.id} className="truncate text-xs sm:text-sm animate-fade-in">
+        {banner.message} <strong className="font-heading">{banner.highlight}</strong>
       </span>
       <a
         href={banner.url}
         target="_blank"
         rel="noopener noreferrer sponsored"
-        className="shrink-0 px-3 py-1 bg-dark rounded-full text-xs font-semibold hover:bg-white hover:text-accent transition-colors"
+        className="shrink-0 px-3 py-1 bg-dark border border-paper/30 font-heading uppercase tracking-wide text-xs hover:bg-paper hover:text-accent hover:border-paper transition-colors"
       >
         {banner.ctaLabel}
       </a>

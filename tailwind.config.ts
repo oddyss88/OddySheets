@@ -17,9 +17,9 @@ const config: Config = {
       colors: {
         dark: '#1a1611',
         card: '#221d16',
-        line: '#3d3626',
+        line: '#564c37',
         accent: '#3f79c9',
-        accent2: '#c99a2e',
+        accent2: '#ab7233',
         paper: '#f0e6d2',
         ink: '#cdc4ac',
         muted: '#8f8570',

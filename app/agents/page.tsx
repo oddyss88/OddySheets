@@ -14,7 +14,7 @@ export default function AgentsPage() {
       blurb="Vetted by us, updated regularly — these are the shipping agents we recommend for a smooth experience."
       listKey="trusted_agents"
       icon={<UserCheck className="w-6 h-6 text-accent" />}
-      emptyIcon={<UserCheck className="w-16 h-16 text-gray-700 mx-auto" />}
+      emptyIcon={<UserCheck className="w-14 h-14 text-line mx-auto" strokeWidth={1.5} />}
     />
   )
 }

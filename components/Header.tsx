@@ -33,7 +33,7 @@ export default function Header({ showMenu = true }: HeaderProps) {
 
   return (
     <header className="sticky top-9 z-50 bg-paper border-b border-rule">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         <div className="flex items-center justify-between">
           <Link href="/" className="font-serif text-2xl text-ink">
             OddySheets

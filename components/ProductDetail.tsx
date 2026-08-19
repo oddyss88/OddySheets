@@ -61,7 +61,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
     return (
       <main className="min-h-screen bg-paper">
         <Header />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="aspect-square bg-linen animate-pulse rounded-lg" />
             <div className="space-y-4">
@@ -91,7 +91,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
     <main className="min-h-screen bg-paper pb-24 md:pb-12">
       <Header />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
         <nav className="flex items-center gap-2 text-sm text-dust mb-8">
           <Link href="/" className="hover:text-ink transition-colors">Home</Link>
           <ChevronRight className="w-3.5 h-3.5" />
@@ -162,7 +162,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
             <h2 className="font-serif text-xl text-ink mb-2">
               More from {product.category}
             </h2>
-            <div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map(related => (
                 <ProductCard key={related.id} product={related} />
               ))}

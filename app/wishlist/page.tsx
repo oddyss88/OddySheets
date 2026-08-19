@@ -34,13 +34,13 @@ export default function WishlistPage() {
   return (
     <main className="min-h-screen bg-paper">
       <Header />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="font-serif text-2xl text-ink mb-8">Your wishlist</h1>
 
         {loading ? (
-          <div>
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-24 border-b border-rule animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] rounded-lg bg-linen border border-rule animate-pulse" />
             ))}
           </div>
         ) : products.length === 0 ? (
@@ -58,7 +58,7 @@ export default function WishlistPage() {
             </Link>
           </div>
         ) : (
-          <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}

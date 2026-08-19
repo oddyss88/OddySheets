@@ -20,57 +20,54 @@ export default function ProductCard({
   const wishlisted = isWishlisted(product.id)
 
   return (
-    <div className="flex items-center gap-4 py-4 border-b border-rule group animate-fade-in">
-      <Link href={`/product/${product.id}`} className="shrink-0">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-linen overflow-hidden">
+    <div className="relative bg-linen border border-rule rounded-lg overflow-hidden hover:border-accent transition-colors flex flex-col h-full animate-fade-in">
+      <Link href={`/product/${product.id}`} className="block">
+        <div className="relative aspect-square bg-paper overflow-hidden">
           {product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-contain p-2"
+              className="w-full h-full object-contain p-6"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-rule">
-              <Tag className="w-6 h-6" strokeWidth={1.5} />
+              <Tag className="w-12 h-12" strokeWidth={1.25} />
             </div>
           )}
         </div>
       </Link>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between gap-3">
-          <Link href={`/product/${product.id}`}>
-            <h3 className="font-serif text-lg text-ink truncate hover:text-accent transition-colors">
-              {product.name}
-            </h3>
-          </Link>
-          <span className="text-sm text-ink tabular-nums shrink-0">${product.price.toFixed(2)}</span>
+      {showBuyButton && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            toggleWishlist(product.id)
+          }}
+          aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          className={cn(
+            'absolute top-3 left-3 p-2 rounded-full transition-colors',
+            wishlisted ? 'bg-accent text-paper' : 'bg-paper/90 text-graphite hover:text-ink'
+          )}
+        >
+          <Heart className={cn('w-4 h-4', wishlisted && 'fill-current')} strokeWidth={1.5} />
+        </button>
+      )}
+
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <Link href={`/product/${product.id}`}>
+          <h3 className="font-serif text-lg text-ink leading-snug line-clamp-2 hover:text-accent transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="flex items-center justify-between">
+          <span className="text-ink tabular-nums">${product.price.toFixed(2)}</span>
+          {product.status !== 'in-stock' && <ProductStatusBadge status={product.status} />}
         </div>
 
         {product.description && (
-          <p className="text-xs text-dust truncate mt-0.5">{product.description}</p>
-        )}
-
-        {product.status !== 'in-stock' && (
-          <div className="mt-1.5">
-            <ProductStatusBadge status={product.status} />
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center gap-3 shrink-0">
-        {showBuyButton && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              toggleWishlist(product.id)
-            }}
-            aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-            className={cn('transition-colors', wishlisted ? 'text-accent' : 'text-dust hover:text-ink')}
-          >
-            <Heart className={cn('w-4 h-4', wishlisted && 'fill-current')} strokeWidth={1.5} />
-          </button>
+          <p className="text-xs text-dust line-clamp-2">{product.description}</p>
         )}
 
         {showBuyButton && (
@@ -79,7 +76,7 @@ export default function ProductCard({
             target="_blank"
             rel="noopener noreferrer sponsored"
             onClick={() => logProductClick(product.id)}
-            className="text-sm font-medium text-accent hover:underline whitespace-nowrap"
+            className="mt-auto flex items-center justify-center py-2.5 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors text-sm font-medium"
           >
             Buy
           </a>

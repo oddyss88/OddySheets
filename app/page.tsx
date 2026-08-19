@@ -107,7 +107,7 @@ function HomeContent() {
       <Header />
       <Hero />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         <SearchBar value={searchQuery} onChange={setSearchQuery} products={products} />
         <CategoryFilter
           categories={[...FILTER_CATEGORIES]}
@@ -125,13 +125,13 @@ function HomeContent() {
         )}
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {loading ? (
-          <div>
-            {[...Array(5)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="h-24 border-b border-rule animate-pulse"
+                className="aspect-[3/4] rounded-lg bg-linen border border-rule animate-pulse"
                 style={{ animationDelay: `${i * 75}ms` }}
               />
             ))}
@@ -140,8 +140,8 @@ function HomeContent() {
           <EmptyState variant={getEmptyVariant()} category={selectedCategory} />
         ) : (
           <>
-            <h2 className="font-serif text-xl text-ink mb-2">{gridHeading}</h2>
-            <div>
+            <h2 className="font-serif text-xl text-ink mb-4">{gridHeading}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

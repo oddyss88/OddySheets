@@ -11,15 +11,15 @@ export default function NotFoundView({
   message = "This page doesn't exist or may have been removed.",
 }: NotFoundViewProps) {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-20 text-center animate-fade-in">
-      <Tag className="w-14 h-14 text-line mx-auto mb-4" strokeWidth={1.5} />
-      <h1 className="font-heading uppercase tracking-wide text-2xl text-paper mb-2">{title}</h1>
-      <p className="text-muted mb-6">{message}</p>
+    <div className="max-w-3xl mx-auto px-4 py-20 text-center animate-fade-in">
+      <Tag className="w-10 h-10 text-rule mx-auto mb-4" strokeWidth={1.25} />
+      <h1 className="font-serif text-2xl text-ink mb-2">{title}</h1>
+      <p className="text-dust mb-6">{message}</p>
       <Link
         href="/"
-        className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-paper font-heading uppercase tracking-wide transition-colors text-sm"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors text-sm"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
         Back to catalog
       </Link>
     </div>

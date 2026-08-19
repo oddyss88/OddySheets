@@ -14,7 +14,7 @@ interface AdminTrustedLinksProps {
 const EMPTY_ENTRY_FORM = { name: '', url: '', note: '' }
 
 const inputClass =
-  'w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors'
+  'w-full px-4 py-3 bg-paper border border-rule rounded-lg text-ink placeholder-dust focus:outline-none focus:border-accent transition-colors'
 
 function LinkSection({
   title,
@@ -61,53 +61,53 @@ function LinkSection({
   }
 
   return (
-    <div className="bg-card rounded-xl border border-white/10 p-6 space-y-4">
+    <div className="bg-linen rounded-lg border border-rule p-6 space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="font-display text-lg font-bold">{title}</h2>
+        <h2 className="font-serif text-lg text-ink">{title}</h2>
       </div>
 
       <div className="space-y-2">
         {entries.length === 0 && (
-          <p className="text-sm text-gray-500">None added yet.</p>
+          <p className="text-sm text-dust">None added yet.</p>
         )}
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className="flex items-center justify-between gap-3 px-4 py-3 bg-dark rounded-lg border border-white/5"
+            className="flex items-center justify-between gap-3 px-4 py-3 bg-paper rounded-lg border border-rule"
           >
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <p className="font-medium truncate">{entry.name}</p>
+                <p className="text-ink truncate">{entry.name}</p>
                 <a
                   href={entry.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-accent shrink-0"
+                  className="text-dust hover:text-accent shrink-0"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} />
                 </a>
               </div>
-              {entry.note && <p className="text-xs text-gray-500 truncate">{entry.note}</p>}
+              {entry.note && <p className="text-xs text-dust truncate">{entry.note}</p>}
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={() => startEdit(entry)}
-                className="p-2 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+                className="p-2 hover:bg-accent/10 text-accent rounded-md transition-colors"
               >
-                <Edit2 className="w-4 h-4" />
+                <Edit2 className="w-4 h-4" strokeWidth={1.5} />
               </button>
               {deleteConfirm === entry.id ? (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => { onDelete(entry.id); setDeleteConfirm(null) }}
-                    className="px-3 py-1 bg-red-600 text-white text-xs rounded-lg"
+                    className="px-3 py-1 bg-brick text-paper text-xs rounded-md"
                   >
                     Confirm
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(null)}
-                    className="px-3 py-1 bg-white/10 text-xs rounded-lg"
+                    className="px-3 py-1 bg-rule/40 text-ink text-xs rounded-md"
                   >
                     Cancel
                   </button>
@@ -115,9 +115,9 @@ function LinkSection({
               ) : (
                 <button
                   onClick={() => setDeleteConfirm(entry.id)}
-                  className="p-2 hover:bg-red-600/20 text-red-400 rounded-lg transition-colors"
+                  className="p-2 hover:bg-brick/10 text-brick rounded-md transition-colors"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                 </button>
               )}
             </div>
@@ -125,7 +125,7 @@ function LinkSection({
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2 pt-2 border-t border-white/5">
+      <form onSubmit={handleSubmit} className="space-y-2 pt-2 border-t border-rule">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <input
             required
@@ -155,16 +155,16 @@ function LinkSection({
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 disabled:opacity-50 text-paper rounded-lg text-sm transition-colors"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            {editingId ? 'Save Changes' : 'Add'}
+            {editingId ? 'Save changes' : 'Add'}
           </button>
           {editingId && (
             <button
               type="button"
               onClick={cancelEdit}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-rule/30 hover:bg-rule/50 text-ink rounded-lg text-sm transition-colors"
             >
               Cancel
             </button>
@@ -215,14 +215,14 @@ export default function AdminTrustedLinks({ onToast }: AdminTrustedLinksProps) {
   }
 
   if (loading) {
-    return <p className="text-gray-500 text-sm">Loading trusted links...</p>
+    return <p className="text-dust text-sm">Loading trusted links...</p>
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <LinkSection
-        title="Trusted Yupoo Sellers"
-        icon={<Store className="w-5 h-5 text-accent" />}
+        title="Trusted Yupoo sellers"
+        icon={<Store className="w-5 h-5 text-accent" strokeWidth={1.5} />}
         entries={settings.yupoo_sellers}
         saving={saving}
         onAdd={(entry) => addEntry('yupoo_sellers', entry)}
@@ -230,8 +230,8 @@ export default function AdminTrustedLinks({ onToast }: AdminTrustedLinksProps) {
         onDelete={(id) => deleteEntry('yupoo_sellers', id)}
       />
       <LinkSection
-        title="Trusted Agents"
-        icon={<UserCheck className="w-5 h-5 text-accent" />}
+        title="Trusted agents"
+        icon={<UserCheck className="w-5 h-5 text-accent" strokeWidth={1.5} />}
         entries={settings.trusted_agents}
         saving={saving}
         onAdd={(entry) => addEntry('trusted_agents', entry)}

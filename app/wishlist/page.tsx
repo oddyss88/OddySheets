@@ -32,33 +32,33 @@ export default function WishlistPage() {
   }, [ids])
 
   return (
-    <main className="min-h-screen bg-dark">
+    <main className="min-h-screen bg-paper">
       <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="font-heading uppercase tracking-wide text-2xl text-paper mb-8">Your Wishlist</h1>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <h1 className="font-serif text-2xl text-ink mb-8">Your wishlist</h1>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-card h-[420px] animate-pulse border border-line" />
+          <div>
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-24 border-b border-rule animate-pulse" />
             ))}
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-20 animate-fade-in">
-            <Heart className="w-14 h-14 text-line mx-auto mb-4" strokeWidth={1.5} />
-            <p className="text-paper text-lg font-heading uppercase tracking-wide">Your wishlist is empty</p>
-            <p className="text-muted text-sm mt-2 mb-6">
+            <Heart className="w-10 h-10 text-rule mx-auto mb-4" strokeWidth={1.25} />
+            <p className="font-serif text-lg text-ink">Your wishlist is empty</p>
+            <p className="text-dust text-sm mt-2 mb-6">
               Tap the heart on any product to save it here
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-paper font-heading uppercase tracking-wide transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors text-sm"
             >
               Browse products
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div>
             {products.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}

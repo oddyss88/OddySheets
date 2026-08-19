@@ -59,15 +59,15 @@ export default function ProductDetail({ id }: ProductDetailProps) {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-dark">
+      <main className="min-h-screen bg-paper">
         <Header />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="aspect-square bg-card animate-pulse border border-line" />
+            <div className="aspect-square bg-linen animate-pulse rounded-lg" />
             <div className="space-y-4">
-              <div className="h-8 bg-card animate-pulse w-3/4" />
-              <div className="h-10 bg-card animate-pulse w-1/3" />
-              <div className="h-24 bg-card animate-pulse" />
+              <div className="h-8 bg-linen animate-pulse w-3/4 rounded" />
+              <div className="h-10 bg-linen animate-pulse w-1/3 rounded" />
+              <div className="h-24 bg-linen animate-pulse rounded" />
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function ProductDetail({ id }: ProductDetailProps) {
 
   if (notFound || !product) {
     return (
-      <main className="min-h-screen bg-dark">
+      <main className="min-h-screen bg-paper">
         <Header />
         <NotFoundView
           title="Product not found"
@@ -88,20 +88,20 @@ export default function ProductDetail({ id }: ProductDetailProps) {
   }
 
   return (
-    <main className="min-h-screen bg-dark pb-24 md:pb-12">
+    <main className="min-h-screen bg-paper pb-24 md:pb-12">
       <Header />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
-        <nav className="flex items-center gap-2 text-sm font-mono text-muted mb-8">
-          <Link href="/" className="hover:text-paper transition-colors">Home</Link>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
+        <nav className="flex items-center gap-2 text-sm text-dust mb-8">
+          <Link href="/" className="hover:text-ink transition-colors">Home</Link>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-muted">{product.category}</span>
+          <span>{product.category}</span>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-paper truncate max-w-[200px]">{product.name}</span>
+          <span className="text-ink truncate max-w-[200px]">{product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div className="relative aspect-square bg-paper border border-line overflow-hidden">
+          <div className="relative aspect-square bg-linen rounded-lg overflow-hidden">
             {product.image_url ? (
               <img
                 src={product.image_url}
@@ -109,34 +109,29 @@ export default function ProductDetail({ id }: ProductDetailProps) {
                 className="w-full h-full object-contain p-8"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-line">
-                <Tag className="w-20 h-20" />
+              <div className="w-full h-full flex items-center justify-center text-rule">
+                <Tag className="w-16 h-16" strokeWidth={1.25} />
               </div>
-            )}
-            {product.status === 'new' && (
-              <span className="absolute top-4 right-4 px-3 py-1.5 bg-dark border border-accent2 text-accent2 text-sm font-mono uppercase tracking-wide -rotate-3">
-                New
-              </span>
             )}
           </div>
 
           <div className="flex flex-col">
-            <span className="font-mono text-accent text-sm uppercase tracking-widest mb-2">{product.category}</span>
-            <h1 className="font-heading uppercase tracking-wide text-3xl sm:text-4xl leading-tight text-paper">
+            <span className="text-sm text-dust mb-2">{product.category}</span>
+            <h1 className="font-serif text-3xl sm:text-4xl leading-tight text-ink">
               {product.name}
             </h1>
 
-            <div className="flex items-center gap-4 mt-6">
-              <span className="font-mono tabular-nums text-4xl text-paper">${product.price.toFixed(2)}</span>
-              <ProductStatusBadge status={product.status} className="text-sm px-3 py-1.5" />
+            <div className="flex items-center gap-3 mt-4">
+              <span className="text-2xl text-ink tabular-nums">${product.price.toFixed(2)}</span>
+              <ProductStatusBadge status={product.status} className="text-sm" />
             </div>
 
             {product.description && (
-              <p className="mt-6 text-ink leading-relaxed">{product.description}</p>
+              <p className="mt-6 text-graphite leading-relaxed">{product.description}</p>
             )}
 
             {product.status === 'pre-order' && (
-              <p className="mt-4 text-accent2 text-sm bg-accent2/10 border border-accent2/40 px-4 py-3">
+              <p className="mt-4 text-sm text-graphite bg-linen rounded-lg px-4 py-3">
                 Pre-order item — shipping typically starts 7–15 days after ordering.
               </p>
             )}
@@ -146,15 +141,15 @@ export default function ProductDetail({ id }: ProductDetailProps) {
               target="_blank"
               rel="noopener noreferrer sponsored"
               onClick={() => logProductClick(product.id)}
-              className="hidden md:flex items-center justify-center gap-2 w-full py-4 bg-accent hover:bg-accent/90 text-paper transition-colors font-heading uppercase tracking-wide text-lg mt-8"
+              className="hidden md:flex items-center justify-center gap-2 w-full py-3.5 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors mt-8"
             >
               Buy on Superbuy
-              <ArrowUpRight className="w-5 h-5" />
+              <ArrowUpRight className="w-4 h-4" />
             </a>
 
             <Link
               href="/"
-              className="hidden md:flex items-center justify-center gap-2 w-full py-3 mt-3 text-muted hover:text-paper transition-colors text-sm font-mono uppercase tracking-wide"
+              className="hidden md:flex items-center justify-center gap-2 w-full py-3 mt-3 text-dust hover:text-ink transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to catalog
@@ -163,11 +158,11 @@ export default function ProductDetail({ id }: ProductDetailProps) {
         </div>
 
         {relatedProducts.length > 0 && (
-          <section className="mt-16 pt-10 border-t border-line">
-            <h2 className="font-heading uppercase tracking-wide text-xl text-paper mb-6">
+          <section className="mt-14 pt-8 border-t border-rule">
+            <h2 className="font-serif text-xl text-ink mb-2">
               More from {product.category}
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
               {relatedProducts.map(related => (
                 <ProductCard key={related.id} product={related} />
               ))}
@@ -176,16 +171,16 @@ export default function ProductDetail({ id }: ProductDetailProps) {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-dark border-t border-line md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-paper border-t border-rule md:hidden">
         <a
           href={product.affiliate_link}
           target="_blank"
           rel="noopener noreferrer sponsored"
           onClick={() => logProductClick(product.id)}
-          className="flex items-center justify-center gap-2 w-full py-4 bg-accent hover:bg-accent/90 text-paper transition-colors font-heading uppercase tracking-wide"
+          className="flex items-center justify-center gap-2 w-full py-3.5 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors"
         >
           Buy on Superbuy — ${product.price.toFixed(2)}
-          <ArrowUpRight className="w-5 h-5" />
+          <ArrowUpRight className="w-4 h-4" />
         </a>
       </div>
     </main>

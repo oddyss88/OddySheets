@@ -10,9 +10,9 @@ export default function EmptyState({ variant, category }: EmptyStateProps) {
   if (variant === 'no-results') {
     return (
       <div className="text-center py-20 animate-fade-in">
-        <Search className="w-14 h-14 text-line mx-auto mb-4" strokeWidth={1.5} />
-        <p className="text-paper text-lg font-heading uppercase tracking-wide">No matches found</p>
-        <p className="text-muted text-sm mt-2">
+        <Search className="w-10 h-10 text-rule mx-auto mb-4" strokeWidth={1.25} />
+        <p className="font-serif text-lg text-ink">No matches found</p>
+        <p className="text-dust text-sm mt-2">
           Try a different search or category filter
         </p>
       </div>
@@ -22,11 +22,11 @@ export default function EmptyState({ variant, category }: EmptyStateProps) {
   if (variant === 'filtered-category') {
     return (
       <div className="text-center py-20 animate-fade-in">
-        <ShoppingBag className="w-14 h-14 text-line mx-auto mb-4" strokeWidth={1.5} />
-        <p className="text-paper text-lg font-heading uppercase tracking-wide">
+        <ShoppingBag className="w-10 h-10 text-rule mx-auto mb-4" strokeWidth={1.25} />
+        <p className="font-serif text-lg text-ink">
           {category === 'New' ? 'No new arrivals right now' : `No drops in ${category} yet`}
         </p>
-        <p className="text-muted text-sm mt-2">
+        <p className="text-dust text-sm mt-2">
           Check back soon — new items are added regularly
         </p>
       </div>
@@ -35,16 +35,16 @@ export default function EmptyState({ variant, category }: EmptyStateProps) {
 
   return (
     <div className="text-center py-20 animate-fade-in">
-      <ShoppingBag className="w-14 h-14 text-line mx-auto mb-4" strokeWidth={1.5} />
-      <p className="text-paper text-lg font-heading uppercase tracking-wide">No drops yet</p>
-      <p className="text-muted text-sm mt-2 mb-6">
+      <ShoppingBag className="w-10 h-10 text-rule mx-auto mb-4" strokeWidth={1.25} />
+      <p className="font-serif text-lg text-ink">No drops yet</p>
+      <p className="text-dust text-sm mt-2 mb-6">
         The catalog is empty — add your first product to get started
       </p>
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-paper font-heading uppercase tracking-wide transition-colors text-sm"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors text-sm"
       >
-        Go to Admin
+        Go to admin
       </Link>
     </div>
   )

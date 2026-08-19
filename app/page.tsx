@@ -103,11 +103,11 @@ function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen bg-dark">
+    <main className="min-h-screen bg-paper">
       <Header />
       <Hero />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-4">
         <SearchBar value={searchQuery} onChange={setSearchQuery} products={products} />
         <CategoryFilter
           categories={[...FILTER_CATEGORIES]}
@@ -125,13 +125,13 @@ function HomeContent() {
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
+          <div>
+            {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="bg-card h-[420px] animate-pulse border border-line"
+                className="h-24 border-b border-rule animate-pulse"
                 style={{ animationDelay: `${i * 75}ms` }}
               />
             ))}
@@ -140,23 +140,17 @@ function HomeContent() {
           <EmptyState variant={getEmptyVariant()} category={selectedCategory} />
         ) : (
           <>
-            <h2 className="font-heading uppercase tracking-wide text-xl text-paper mb-6">{gridHeading}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {visibleProducts.map((product, i) => (
-                <div
-                  key={product.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${Math.min(i * 40, 400)}ms` }}
-                >
-                  <ProductCard product={product} />
-                </div>
+            <h2 className="font-serif text-xl text-ink mb-2">{gridHeading}</h2>
+            <div>
+              {visibleProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
             {hasMore && (
-              <div className="flex justify-center mt-10">
+              <div className="flex justify-center mt-8">
                 <button
                   onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                  className="px-8 py-3 bg-card hover:border-accent border border-line font-heading uppercase tracking-wide transition-colors text-sm text-paper"
+                  className="px-6 py-2.5 bg-linen hover:border-accent border border-rule rounded-lg transition-colors text-sm text-ink"
                 >
                   Load more ({filteredProducts.length - visibleCount} remaining)
                 </button>
@@ -175,7 +169,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-dark" />}>
+    <Suspense fallback={<div className="min-h-screen bg-paper" />}>
       <HomeContent />
     </Suspense>
   )

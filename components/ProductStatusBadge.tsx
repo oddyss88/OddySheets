@@ -9,13 +9,7 @@ interface ProductStatusBadgeProps {
 
 export default function ProductStatusBadge({ status, className }: ProductStatusBadgeProps) {
   return (
-    <span
-      className={cn(
-        'px-2 py-1 text-[10px] font-mono uppercase tracking-wide border',
-        STATUS_COLORS[status],
-        className
-      )}
-    >
+    <span className={cn('text-xs', STATUS_COLORS[status], className)}>
       {STATUS_LABELS[status]}
     </span>
   )

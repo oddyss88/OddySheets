@@ -2,17 +2,17 @@ import { Product, ProductStatus } from '@/types/product'
 import { SortOption } from '@/lib/constants'
 
 export const STATUS_COLORS: Record<ProductStatus, string> = {
-  new: 'bg-accent2/10 text-accent2 border-accent2/40',
-  'in-stock': 'bg-accent/10 text-accent border-accent/40',
-  'pre-order': 'bg-line/40 text-muted border-line',
-  'sold-out': 'bg-brick/10 text-brick border-brick/40',
+  new: 'text-accent2',
+  'in-stock': 'text-dust',
+  'pre-order': 'text-dust',
+  'sold-out': 'text-brick',
 }
 
 export const STATUS_LABELS: Record<ProductStatus, string> = {
-  new: 'NEW',
-  'in-stock': 'In Stock',
-  'pre-order': 'Pre-Order',
-  'sold-out': 'Sold Out',
+  new: 'new',
+  'in-stock': 'in stock',
+  'pre-order': 'pre-order',
+  'sold-out': 'sold out',
 }
 
 export function sortProducts(products: Product[], sort: SortOption): Product[] {

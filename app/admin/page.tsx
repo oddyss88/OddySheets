@@ -23,7 +23,7 @@ interface ImportRow extends SheetRow {
 }
 
 const STATUSES: { value: ProductStatus; label: string }[] = [
-  { value: 'new', label: 'NEW' },
+  { value: 'new', label: 'New' },
   { value: 'in-stock', label: 'In Stock' },
   { value: 'pre-order', label: 'Pre-Order' },
   { value: 'sold-out', label: 'Sold Out' },
@@ -55,7 +55,7 @@ interface ToastState {
 }
 
 const inputClass =
-  'w-full px-4 py-3 bg-dark border border-white/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors'
+  'w-full px-4 py-3 bg-paper border border-rule rounded-lg text-ink placeholder-dust focus:outline-none focus:border-accent transition-colors'
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'products' | 'links'>('products')
@@ -369,11 +369,11 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-dark flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-card rounded-2xl border border-white/10 p-8 animate-fade-in">
+      <div className="min-h-screen bg-paper flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-linen rounded-lg border border-rule p-8 animate-fade-in">
           <div className="text-center mb-8">
-            <h1 className="font-display text-2xl font-bold">OddySheets Admin</h1>
-            <p className="text-gray-400 mt-2">Enter your admin password</p>
+            <h1 className="font-serif text-2xl text-ink">OddySheets Admin</h1>
+            <p className="text-dust mt-2">Enter your admin password</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -394,15 +394,15 @@ export default function AdminPage() {
               className={inputClass}
             />
             {loginError && (
-              <div className="flex items-center gap-2 text-red-400 text-sm">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-brick text-sm">
+                <AlertCircle className="w-4 h-4" strokeWidth={1.5} />
                 {loginError}
               </div>
             )}
             <button
               type="submit"
               disabled={loginSubmitting}
-              className="w-full py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors"
+              className="w-full py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 text-paper rounded-lg transition-colors"
             >
               {loginSubmitting ? 'Signing in...' : 'Login'}
             </button>
@@ -413,49 +413,49 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark">
-      <header className="sticky top-0 z-50 bg-dark/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-paper">
+      <header className="sticky top-0 z-50 bg-paper border-b border-rule">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/" className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5" />
+              <Link href="/" className="p-2 hover:bg-rule/30 rounded-md transition-colors text-ink">
+                <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
               </Link>
-              <h1 className="font-display text-xl font-bold">Dashboard</h1>
+              <h1 className="font-serif text-xl text-ink">Dashboard</h1>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brick/10 hover:bg-brick/20 text-brick rounded-lg transition-colors"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4" strokeWidth={1.5} />
               Logout
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-2 mb-8 border-b border-white/10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-2 mb-8 border-b border-rule">
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex items-center gap-2 px-4 py-3 text-sm border-b-2 transition-colors ${
               activeTab === 'products'
-                ? 'border-accent text-white'
-                : 'border-transparent text-gray-500 hover:text-gray-300'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-dust hover:text-ink'
             }`}
           >
-            <Package className="w-4 h-4" />
+            <Package className="w-4 h-4" strokeWidth={1.5} />
             Products
           </button>
           <button
             onClick={() => setActiveTab('links')}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex items-center gap-2 px-4 py-3 text-sm border-b-2 transition-colors ${
               activeTab === 'links'
-                ? 'border-accent text-white'
-                : 'border-transparent text-gray-500 hover:text-gray-300'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-dust hover:text-ink'
             }`}
           >
-            <ListChecks className="w-4 h-4" />
+            <ListChecks className="w-4 h-4" strokeWidth={1.5} />
             Trusted Links
           </button>
         </div>
@@ -467,19 +467,19 @@ export default function AdminPage() {
         {activeTab === 'products' && (
         <>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-card rounded-xl p-6 border border-white/5">
-            <p className="text-gray-400 text-sm">Total Products</p>
-            <p className="font-display text-3xl font-bold mt-1">{products.length}</p>
+          <div className="bg-linen rounded-lg p-6 border border-rule">
+            <p className="text-dust text-sm">Total Products</p>
+            <p className="font-serif text-3xl text-ink mt-1">{products.length}</p>
           </div>
-          <div className="bg-card rounded-xl p-6 border border-white/5">
-            <p className="text-gray-400 text-sm">Categories</p>
-            <p className="font-display text-3xl font-bold mt-1">
+          <div className="bg-linen rounded-lg p-6 border border-rule">
+            <p className="text-dust text-sm">Categories</p>
+            <p className="font-serif text-3xl text-ink mt-1">
               {new Set(products.map(p => p.category)).size}
             </p>
           </div>
-          <div className="bg-card rounded-xl p-6 border border-white/5">
-            <p className="text-gray-400 text-sm">NEW Items</p>
-            <p className="font-display text-3xl font-bold mt-1 text-green-400">
+          <div className="bg-linen rounded-lg p-6 border border-rule">
+            <p className="text-dust text-sm">New Items</p>
+            <p className="font-serif text-3xl text-accent2 mt-1">
               {products.filter(p => p.status === 'new').length}
             </p>
           </div>
@@ -489,35 +489,35 @@ export default function AdminPage() {
           <div className="flex flex-wrap gap-3 mb-8">
             <button
               onClick={() => setShowAddForm(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5" strokeWidth={1.5} />
               Add Product
             </button>
             <button
               onClick={() => setShowCsvImport(v => !v)}
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-linen hover:bg-rule/40 border border-rule text-ink rounded-lg transition-colors"
             >
-              <Upload className="w-5 h-5" />
+              <Upload className="w-5 h-5" strokeWidth={1.5} />
               Bulk Import (CSV)
             </button>
             <button
               onClick={() => setShowSheetImport(v => !v)}
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-linen hover:bg-rule/40 border border-rule text-ink rounded-lg transition-colors"
             >
-              <FileSpreadsheet className="w-5 h-5" />
+              <FileSpreadsheet className="w-5 h-5" strokeWidth={1.5} />
               Import from Sheet
             </button>
           </div>
         )}
 
         {showCsvImport && !showAddForm && (
-          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8 animate-fade-in space-y-4">
+          <div className="bg-linen rounded-lg border border-rule p-6 mb-8 animate-fade-in space-y-4">
             <div>
-              <h2 className="font-display text-xl font-bold mb-1">Bulk Import (CSV)</h2>
-              <p className="text-sm text-gray-500">
-                First row must be a header with column names. Required: <code className="text-gray-400">name, price, category, affiliate_link</code>.
-                Optional: <code className="text-gray-400">image_url, status, description</code>. One row per line.
+              <h2 className="font-serif text-xl text-ink mb-1">Bulk Import (CSV)</h2>
+              <p className="text-sm text-dust">
+                First row must be a header with column names. Required: <code className="text-graphite">name, price, category, affiliate_link</code>.
+                Optional: <code className="text-graphite">image_url, status, description</code>. One row per line.
               </p>
             </div>
             <textarea
@@ -531,13 +531,13 @@ export default function AdminPage() {
               <button
                 onClick={handleCsvImport}
                 disabled={csvImporting || !csvText.trim()}
-                className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors"
+                className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 text-paper rounded-lg transition-colors"
               >
                 {csvImporting ? 'Importing...' : 'Import'}
               </button>
               <button
                 onClick={() => { setShowCsvImport(false); setCsvText('') }}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+                className="px-6 py-3 bg-rule/30 hover:bg-rule/50 text-ink rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -546,14 +546,14 @@ export default function AdminPage() {
         )}
 
         {showSheetImport && !showAddForm && (
-          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8 animate-fade-in space-y-4">
+          <div className="bg-linen rounded-lg border border-rule p-6 mb-8 animate-fade-in space-y-4">
             <div>
-              <h2 className="font-display text-xl font-bold mb-1">Import from Google Sheet</h2>
-              <p className="text-sm text-gray-500">
+              <h2 className="font-serif text-xl text-ink mb-1">Import from Google Sheet</h2>
+              <p className="text-sm text-dust">
                 Sheet must be shared as &quot;Anyone with the link can view.&quot; Required columns:{' '}
-                <code className="text-gray-400">name, price, category, link</code>. Optional:{' '}
-                <code className="text-gray-400">image_url, status, description</code>.{' '}
-                <code className="text-gray-400">link</code> can be a Superbuy or Weidian product link —
+                <code className="text-graphite">name, price, category, link</code>. Optional:{' '}
+                <code className="text-graphite">image_url, status, description</code>.{' '}
+                <code className="text-graphite">link</code> can be a Superbuy or Weidian product link —
                 it&apos;s converted to your affiliate link automatically when possible. Missing images
                 are fetched from the product page automatically.
               </p>
@@ -569,36 +569,36 @@ export default function AdminPage() {
               <button
                 onClick={handleFetchSheet}
                 disabled={sheetFetching || !sheetUrl.trim()}
-                className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors whitespace-nowrap"
+                className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 text-paper rounded-lg transition-colors whitespace-nowrap"
               >
                 {sheetFetching ? 'Fetching...' : 'Fetch Preview'}
               </button>
             </div>
 
             {sheetErrors.length > 0 && (
-              <div className="text-xs text-yellow-400/80 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-4 py-3 space-y-1">
+              <div className="text-xs text-amber-800 bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-3 space-y-1">
                 {sheetErrors.map((err, i) => <p key={i}>{err}</p>)}
               </div>
             )}
 
             {sheetRows.length > 0 && (
               <div className="space-y-4">
-                <div className="border border-white/10 rounded-xl overflow-hidden">
+                <div className="border border-rule rounded-lg overflow-hidden">
                   <div className="overflow-x-auto max-h-96">
                     <table className="w-full">
-                      <thead className="sticky top-0 bg-card">
-                        <tr className="border-b border-white/10">
+                      <thead className="sticky top-0 bg-linen">
+                        <tr className="border-b border-rule">
                           <th className="px-4 py-3"></th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Image</th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Name</th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Price</th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Category</th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-gray-400">Affiliate Link</th>
+                          <th className="text-left px-4 py-3 text-xs text-dust">Image</th>
+                          <th className="text-left px-4 py-3 text-xs text-dust">Name</th>
+                          <th className="text-left px-4 py-3 text-xs text-dust">Price</th>
+                          <th className="text-left px-4 py-3 text-xs text-dust">Category</th>
+                          <th className="text-left px-4 py-3 text-xs text-dust">Affiliate Link</th>
                         </tr>
                       </thead>
                       <tbody>
                         {sheetRows.map((row, i) => (
-                          <tr key={i} className="border-b border-white/5">
+                          <tr key={i} className="border-b border-rule">
                             <td className="px-4 py-3">
                               <input
                                 type="checkbox"
@@ -609,29 +609,29 @@ export default function AdminPage() {
                             </td>
                             <td className="px-4 py-3">
                               {row.imageFetching ? (
-                                <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-                                  <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
+                                <div className="w-10 h-10 rounded-md bg-paper flex items-center justify-center">
+                                  <Loader2 className="w-4 h-4 text-dust animate-spin" />
                                 </div>
                               ) : row.image_url ? (
-                                <img src={row.image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                                <img src={row.image_url} alt="" className="w-10 h-10 rounded-md object-cover" />
                               ) : (
-                                <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-                                  <ImageIcon className="w-4 h-4 text-gray-600" />
+                                <div className="w-10 h-10 rounded-md bg-paper flex items-center justify-center">
+                                  <ImageIcon className="w-4 h-4 text-dust" strokeWidth={1.5} />
                                 </div>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-sm max-w-[200px] truncate">{row.name}</td>
-                            <td className="px-4 py-3 text-sm">${row.price.toFixed(2)}</td>
-                            <td className="px-4 py-3 text-sm text-gray-400">{row.category}</td>
+                            <td className="px-4 py-3 text-sm max-w-[200px] truncate text-ink">{row.name}</td>
+                            <td className="px-4 py-3 text-sm text-ink">${row.price.toFixed(2)}</td>
+                            <td className="px-4 py-3 text-sm text-dust">{row.category}</td>
                             <td className="px-4 py-3">
                               {row.linkConverted ? (
-                                <span className="flex items-center gap-1.5 text-xs text-green-400">
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span className="flex items-center gap-1.5 text-xs text-accent2">
+                                  <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={1.5} />
                                   Affiliate link
                                 </span>
                               ) : (
-                                <span className="flex items-center gap-1.5 text-xs text-yellow-400">
-                                  <AlertTriangle className="w-3.5 h-3.5" />
+                                <span className="flex items-center gap-1.5 text-xs text-amber-700">
+                                  <AlertTriangle className="w-3.5 h-3.5" strokeWidth={1.5} />
                                   Check link
                                 </span>
                               )}
@@ -647,7 +647,7 @@ export default function AdminPage() {
                   <button
                     onClick={handleImportSheetRows}
                     disabled={sheetImporting || sheetRows.every(r => !r.include)}
-                    className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 rounded-xl font-medium transition-colors"
+                    className="px-6 py-3 bg-accent hover:bg-accent/90 disabled:opacity-50 text-paper rounded-lg transition-colors"
                   >
                     {sheetImporting
                       ? 'Importing...'
@@ -655,7 +655,7 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() => { setShowSheetImport(false); setSheetRows([]); setSheetUrl('') }}
-                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+                    className="px-6 py-3 bg-rule/30 hover:bg-rule/50 text-ink rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
@@ -666,8 +666,8 @@ export default function AdminPage() {
         )}
 
         {showAddForm && (
-          <div className="bg-card rounded-xl border border-white/10 p-6 mb-8 animate-fade-in">
-            <h2 className="font-display text-xl font-bold mb-6">
+          <div className="bg-linen rounded-lg border border-rule p-6 mb-8 animate-fade-in">
+            <h2 className="font-serif text-xl text-ink mb-6">
               {editingProduct ? 'Edit Product' : 'Add New Product'}
             </h2>
 
@@ -675,8 +675,8 @@ export default function AdminPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <Tag className="w-4 h-4" /> Product Name
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <Tag className="w-4 h-4" strokeWidth={1.5} /> Product Name
                     </label>
                     <input
                       required
@@ -689,8 +689,8 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" /> Price (USD)
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <DollarSign className="w-4 h-4" strokeWidth={1.5} /> Price (USD)
                     </label>
                     <input
                       required
@@ -705,8 +705,8 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <Tag className="w-4 h-4" /> Category
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <Tag className="w-4 h-4" strokeWidth={1.5} /> Category
                     </label>
                     <select
                       value={formData.category}
@@ -720,8 +720,8 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" /> Status
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" strokeWidth={1.5} /> Status
                     </label>
                     <select
                       value={formData.status}
@@ -735,8 +735,8 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4" /> Image URL
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4" strokeWidth={1.5} /> Image URL
                     </label>
                     <input
                       type="url"
@@ -745,14 +745,14 @@ export default function AdminPage() {
                       onChange={(e) => updateFormField('image_url', e.target.value)}
                       className={inputClass}
                     />
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-dust">
                       Upload to Imgur, Postimages, or Cloudinary and paste the direct link
                     </p>
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <LinkIcon className="w-4 h-4" /> Superbuy Affiliate Link
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <LinkIcon className="w-4 h-4" strokeWidth={1.5} /> Superbuy Affiliate Link
                     </label>
                     <input
                       required
@@ -765,8 +765,8 @@ export default function AdminPage() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm text-gray-400 flex items-center gap-2">
-                      <FileText className="w-4 h-4" /> Description (optional)
+                    <label className="text-sm text-dust flex items-center gap-2">
+                      <FileText className="w-4 h-4" strokeWidth={1.5} /> Description (optional)
                     </label>
                     <textarea
                       rows={3}
@@ -781,14 +781,14 @@ export default function AdminPage() {
                 <div className="flex gap-3 pt-4">
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-accent hover:bg-accent/90 rounded-xl font-medium transition-colors"
+                    className="px-6 py-3 bg-accent hover:bg-accent/90 text-paper rounded-lg transition-colors"
                   >
                     {editingProduct ? 'Update Product' : 'Add Product'}
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors"
+                    className="px-6 py-3 bg-rule/30 hover:bg-rule/50 text-ink rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
@@ -796,8 +796,8 @@ export default function AdminPage() {
               </form>
 
               <div>
-                <div className="flex items-center gap-2 mb-4 text-gray-400 text-sm">
-                  <Eye className="w-4 h-4" />
+                <div className="flex items-center gap-2 mb-4 text-dust text-sm">
+                  <Eye className="w-4 h-4" strokeWidth={1.5} />
                   Live Preview
                 </div>
                 {previewProduct ? (
@@ -805,8 +805,8 @@ export default function AdminPage() {
                     <ProductCard product={previewProduct} showBuyButton={false} />
                   </div>
                 ) : (
-                  <div className="max-w-sm bg-card rounded-xl border border-dashed border-white/10 p-8 text-center text-gray-600">
-                    <ImageIcon className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <div className="max-w-sm bg-paper border border-dashed border-rule rounded-lg p-8 text-center text-dust">
+                    <ImageIcon className="w-10 h-10 mx-auto mb-3 opacity-50" strokeWidth={1.5} />
                     <p className="text-sm">Start typing to see a preview</p>
                   </div>
                 )}
@@ -815,46 +815,46 @@ export default function AdminPage() {
           </div>
         )}
 
-        <div className="bg-card rounded-xl border border-white/10 overflow-hidden">
+        <div className="bg-linen rounded-lg border border-rule overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-400">Image</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-400">Name</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-400">Price</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-400">Category</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-gray-400">Status</th>
-                  <th className="text-right px-6 py-4 text-sm font-medium text-gray-400">Actions</th>
+                <tr className="border-b border-rule">
+                  <th className="text-left px-6 py-4 text-sm text-dust">Image</th>
+                  <th className="text-left px-6 py-4 text-sm text-dust">Name</th>
+                  <th className="text-left px-6 py-4 text-sm text-dust">Price</th>
+                  <th className="text-left px-6 py-4 text-sm text-dust">Category</th>
+                  <th className="text-left px-6 py-4 text-sm text-dust">Status</th>
+                  <th className="text-right px-6 py-4 text-sm text-dust">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading...</td>
+                    <td colSpan={6} className="px-6 py-8 text-center text-dust">Loading...</td>
                   </tr>
                 ) : products.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-8 text-center text-dust">
                       No products yet. Click &quot;Add Product&quot; to get started.
                     </td>
                   </tr>
                 ) : (
                   products.map((product) => (
-                    <tr key={product.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <tr key={product.id} className="border-b border-rule hover:bg-paper/60 transition-colors">
                       <td className="px-6 py-4">
                         {product.image_url ? (
-                          <img src={product.image_url} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                          <img src={product.image_url} alt="" className="w-12 h-12 rounded-md object-cover bg-paper" />
                         ) : (
-                          <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center">
-                            <ImageIcon className="w-5 h-5 text-gray-600" />
+                          <div className="w-12 h-12 rounded-md bg-paper flex items-center justify-center">
+                            <ImageIcon className="w-5 h-5 text-dust" strokeWidth={1.5} />
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 font-medium max-w-xs truncate">{product.name}</td>
-                      <td className="px-6 py-4">${product.price.toFixed(2)}</td>
+                      <td className="px-6 py-4 max-w-xs truncate text-ink">{product.name}</td>
+                      <td className="px-6 py-4 text-ink">${product.price.toFixed(2)}</td>
                       <td className="px-6 py-4">
-                        <span className="px-2 py-1 bg-white/10 rounded text-xs">{product.category}</span>
+                        <span className="px-2 py-1 bg-paper rounded text-xs text-dust">{product.category}</span>
                       </td>
                       <td className="px-6 py-4">
                         <ProductStatusBadge status={product.status} />
@@ -863,21 +863,21 @@ export default function AdminPage() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => startEdit(product)}
-                            className="p-2 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+                            className="p-2 hover:bg-accent/10 text-accent rounded-md transition-colors"
                           >
-                            <Edit2 className="w-4 h-4" />
+                            <Edit2 className="w-4 h-4" strokeWidth={1.5} />
                           </button>
                           {deleteConfirm === product.id ? (
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleDelete(product.id)}
-                                className="px-3 py-1 bg-red-600 text-white text-xs rounded-lg"
+                                className="px-3 py-1 bg-brick text-paper text-xs rounded-md"
                               >
                                 Confirm
                               </button>
                               <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="px-3 py-1 bg-white/10 text-xs rounded-lg"
+                                className="px-3 py-1 bg-rule/40 text-ink text-xs rounded-md"
                               >
                                 Cancel
                               </button>
@@ -885,9 +885,9 @@ export default function AdminPage() {
                           ) : (
                             <button
                               onClick={() => setDeleteConfirm(product.id)}
-                              className="p-2 hover:bg-red-600/20 text-red-400 rounded-lg transition-colors"
+                              className="p-2 hover:bg-brick/10 text-brick rounded-md transition-colors"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                             </button>
                           )}
                         </div>

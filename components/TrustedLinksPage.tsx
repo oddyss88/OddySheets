@@ -27,30 +27,30 @@ export default function TrustedLinksPage({ title, blurb, listKey, icon, emptyIco
   }, [listKey])
 
   return (
-    <main className="min-h-screen bg-dark">
+    <main className="min-h-screen bg-paper">
       <Header />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-wide text-muted hover:text-paper mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-dust hover:text-ink mb-6 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Shop
+          <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+          Back to shop
         </Link>
 
         <div className="flex items-center gap-3 mb-2">
           {icon}
-          <h1 className="font-heading uppercase tracking-wide text-2xl text-paper">{title}</h1>
+          <h1 className="font-serif text-2xl text-ink">{title}</h1>
         </div>
-        <p className="text-muted text-sm mb-8">{blurb}</p>
+        <p className="text-dust text-sm mb-8">{blurb}</p>
 
         {loading ? (
-          <div className="space-y-3">
+          <div>
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="h-[68px] bg-card border border-line animate-pulse"
+                className="h-[68px] border-b border-rule animate-pulse"
                 style={{ animationDelay: `${i * 75}ms` }}
               />
             ))}
@@ -58,26 +58,26 @@ export default function TrustedLinksPage({ title, blurb, listKey, icon, emptyIco
         ) : entries.length === 0 ? (
           <div className="text-center py-20 animate-fade-in">
             {emptyIcon}
-            <p className="text-paper text-lg font-heading uppercase tracking-wide mt-4">None added yet</p>
-            <p className="text-muted text-sm mt-2">Check back soon</p>
+            <p className="font-serif text-lg text-ink mt-4">None added yet</p>
+            <p className="text-dust text-sm mt-2">Check back soon</p>
           </div>
         ) : (
-          <ul className="space-y-3">
-            {entries.map((entry, i) => (
-              <li key={entry.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i * 40, 400)}ms` }}>
+          <ul>
+            {entries.map((entry) => (
+              <li key={entry.id} className="animate-fade-in border-b border-rule">
                 <a
                   href={entry.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between gap-4 px-5 py-4 bg-card border border-line hover:border-accent transition-colors group"
+                  className="flex items-center justify-between gap-4 py-4 group"
                 >
                   <div className="min-w-0">
-                    <p className="font-heading uppercase tracking-wide text-paper group-hover:text-accent transition-colors truncate">{entry.name}</p>
+                    <p className="font-serif text-lg text-ink group-hover:text-accent transition-colors truncate">{entry.name}</p>
                     {entry.note && (
-                      <p className="text-sm text-muted truncate mt-0.5">{entry.note}</p>
+                      <p className="text-sm text-dust truncate mt-0.5">{entry.note}</p>
                     )}
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-muted shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-dust shrink-0" strokeWidth={1.5} />
                 </a>
               </li>
             ))}

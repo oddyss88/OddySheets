@@ -1,30 +1,18 @@
 import type { Metadata } from 'next'
-import { Archivo, Oswald, Bebas_Neue, IBM_Plex_Mono } from 'next/font/google'
+import { Fraunces, Work_Sans } from 'next/font/google'
 import PromoBar from '@/components/PromoBar'
 import './globals.css'
 
-const archivo = Archivo({
+const workSans = Work_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-body',
 })
 
-const oswald = Oswald({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-heading',
-})
-
-const bebasNeue = Bebas_Neue({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-display',
-})
-
-const plexMono = IBM_Plex_Mono({
+const fraunces = Fraunces({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-mono',
+  variable: '--font-serif',
 })
 
 export const metadata: Metadata = {
@@ -51,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${archivo.variable} ${oswald.variable} ${bebasNeue.variable} ${plexMono.variable} font-sans bg-dark text-ink min-h-screen`}
+        className={`${workSans.variable} ${fraunces.variable} font-sans bg-paper text-graphite min-h-screen`}
       >
         <PromoBar />
         {children}

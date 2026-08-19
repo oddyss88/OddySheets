@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 body {
-  background-color: #1a1611;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  color: #cdc4ac;
+  background-color: #e7e4dc;
+  color: #4a463e;
 }
 
 ::-webkit-scrollbar {
@@ -14,15 +13,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1611;
+  background: #e7e4dc;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #564c37;
+  background: #d3cfc4;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8f8570;
+  background: #8a8577;
 }
 
 .scrollbar-hide {
